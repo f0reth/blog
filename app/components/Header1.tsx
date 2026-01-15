@@ -46,7 +46,7 @@ const Header = () => {
 					Blog
 				</a>
 				<a
-					href="https://github.com/daichi2mori"
+					href="https://github.com/f0reth"
 					target="_blank"
 					rel="noreferrer"
 					class={"h-full px-5 flex items-center justify-center gap-0.5"}
@@ -95,7 +95,7 @@ const Header = () => {
 					</svg>
 				</a>
 				<a
-					href="https://github.com/daichi2mori"
+					href="https://github.com/f0reth"
 					target="_blank"
 					rel="noreferrer"
 					class={

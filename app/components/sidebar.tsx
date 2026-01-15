@@ -46,7 +46,7 @@ const Sidebar = () => {
 					</svg>
 				</a>
 				<a
-					href="https://github.com/daichi2mori"
+					href="https://github.com/f0reth"
 					class={
 						"h-9 w-9 bg-btn hover:bg-btn-hover rounded-lg grid place-items-center"
 					}

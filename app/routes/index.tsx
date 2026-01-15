@@ -81,7 +81,7 @@ export default createRoute((c) => {
       </a>
       {/* GitHub */}
       <a
-        href="https://github.com/daichi2mori"
+        href="https://github.com/f0reth"
         target="_blank"
         rel="noreferrer"
         class={
