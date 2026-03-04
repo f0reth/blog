@@ -1,0 +1,99 @@
+---
+title: "Git履歴のメールアドレスを変更する方法"
+description: "Gitの過去コミットに含まれるユーザー名やメールアドレスを一括で変更する方法を解説します。"
+published_at: "2026-03-04"
+modified:
+published: true
+tags: ["python"]
+---
+
+# Git 履歴を書き換える方法
+
+git に設定しているメールアドレスを実際に使用しているもののまま GitHub 上で公開すると、そのメールアドレスが他のユーザーから閲覧できてしまいます。これを避けるために、GitHub が各ユーザー向けに用意している 公開専用メールアドレス に変更して利用します。
+
+以下の`git-filter-repo`を使って変更します。
+
+<LinkCard url="https://github.com/newren/git-filter-repo?tab=readme-ov-file" />
+
+## 要件
+
+今回は`uv`というツールを使用するため、インストールされていない場合は、以下のサイトを確認しインストールしてください。
+
+<LinkCard url="https://docs.astral.sh/uv/getting-started/installation/" />
+
+## 変更
+
+この方法で履歴を変更すると元に戻すことはできません。
+実行前にバックアップを取るようにしてください。
+
+1. メールアドレスの確認
+
+以下コマンドで全履歴の中のメールアドレスを確認します。
+
+```sh
+git log --all --format='%an <%ae>' | sort -u
+```
+
+2. mailmap作成
+
+`mailmap.txt`を作成し、上書きするメールアドレスと名前を記述します。
+
+```txt title="mailmap.txt"
+New Name <new@example.com> Old Name <old@example.com>
+```
+
+3. filter-repo実行
+
+```sh
+uvx git-filter-repo --mailmap mailmap.txt
+```
+
+おそらく上記コマンドではエラーになるため、`--force`オプションを付けると変更されます。
+
+```sh
+uvx git-filter-repo --mailmap mailmap.txt --force
+```
+
+4. 確認
+
+再度以下のコマンドを実行し、メールアドレスが変更されていれば成功です。
+
+```sh
+git log --all --format='%an <%ae>' | sort -u
+```
+
+## GitHubへプッシュ
+
+履歴を書き換えた後は、コミットIDがすべて変わるため、通常の`git push`は使用できません。
+そのため`--force`を使った強制プッシュが必要になります。
+
+1. リモート反映
+
+履歴を書き換えた場合は、削除されています。
+
+確認：
+
+```sh
+git remote -v
+```
+
+そのためリモートを追加します。
+
+```sh
+git remote add origin xxxxx
+```
+
+2. 強制プッシュ
+
+> [!WARNING]
+> 履歴が完全に書き換わるため、共同開発者がいる場合は注意してください。
+
+```sh
+git push origin --force --all
+```
+
+タグも更新する場合：
+
+```sh
+git push origin --force --tags
+```
