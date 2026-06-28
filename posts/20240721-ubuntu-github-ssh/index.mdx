@@ -1,13 +1,13 @@
 ---
-title: "UbuntuでGitHubにSSH接続"
-description: "新しくUbuntu環境を入手したので、GitHubにSSHで接続する流れを書きました。"
+title: "GitHub に SSH 接続する方法"
+description: "GitHub を SSH で安全に利用するための手順をまとめました"
 published_at: "2024-07-21"
-modified: "2024-11-30"
+modified: "2026-06-28"
 published: true
 tags: ["linux", "ubuntu", "github"]
 ---
 
-1. ユーザー情報の登録
+## 1. ユーザー情報の登録
 
 まずローカルにインストールした`git`の設定をします。
 
@@ -22,7 +22,19 @@ git config --global user.email "メールアドレス"
 git config --list
 ```
 
-2. 公開鍵・秘密鍵の発行
+## 2. SSH 鍵を作成する
+
+1.  生成先ディレクトリ作成
+
+```bash
+mkdir -p ~/.ssh
+```
+
+2. 鍵生成
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/github -C "your_email@example.com"
+```
 
 `ssh-keygen`を使用しキーを作成します。
 
@@ -30,17 +42,22 @@ git config --list
 
 `Enter passphrase`と表示されたらセキュアなパスフレーズを入力します。
 
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-以下コマンドで、`id_rsa`と`id_rsa.pub`が生成されていることを確認
+以下コマンドで、`github`と`github.pub`が生成されていることを確認
 
 ```bash
 ls ~/.ssh
 ```
 
-3. 公開鍵を GitHub に登録
+- `-t ed25519`
+  現在推奨されている安全な鍵方式
+
+- `-f ~/.ssh/github`
+  鍵の生成先
+
+- `-C`
+  鍵のコメント。識別しやすくするため。
+
+## 3. 公開鍵を GitHub に登録
 
 GitHub の右上のアイコンをクリックし、「Settings」ページに遷移します。
 その後左メニューに「SSH and GPG keys」があるのでクリックします。
@@ -48,12 +65,12 @@ GitHub の右上のアイコンをクリックし、「Settings」ページに�
 
 ![ssh page](/static/ssh-page.avif)
 
-以下画像の画面に遷移後 Title に自分がわかりやすい名前を記入し、key には`id_rsa.pub`の内容をすべてコピペします。
+以下画像の画面に遷移後 Title に自分がわかりやすい名前を記入し、key には`github.pub`の内容をすべてコピペします。
 「key type」は「Authentication Key」のままで大丈夫です。
 
 ![add ssh key](/static/add-ssh-key.avif)
 
-4. ssh-agent に追加
+## 4. ssh-agent に追加
 
 バックグラウンドで`ssh-agent`を開始します。
 
@@ -67,11 +84,13 @@ eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 ```
 
-5. SSH 接続の確認
+## 5. SSH 接続の確認
 
 ```bash
 ssh -T git@github.com
 ```
+
+初期実行時は「Are you sure you want to continue connecting」と聞かれるため、「yes」と入力し Enter
 
 以下のように表示されれば成功です。
 
@@ -79,38 +98,61 @@ ssh -T git@github.com
 Hi ユーザー名 You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-5. GitHub パスワードを毎回要求されるのを解消
-
-鍵の発行ですべて Enter を押した場合は以下のパスにあるはずです。
+## 6. 鍵設定
 
 ```bash
-ssh-add /home/ユーザー名/.ssh/id_rsa
+touch ~/.ssh/config
 ```
-
-登録されているのを確認します。
 
 ```bash
-ssh-add -l
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/config
 ```
 
-以下のような文字列が表示されれば成功です。
+```txt title="~/.ssh/config"
+Host github
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/github
+  AddKeysToAgent yes
+  IdentitiesOnly yes
+```
+
+- `Host github`
+  SSH のショートカット名
+
+- `HostName github.com`
+  接続するホスト名
+
+- `User git`
+  GitHub の SSH 接続は常に `git` ユーザー
+
+- `IdentityFile`
+  使用する秘密鍵の設定
+
+- `AddKeysToAgent yes`
+  鍵を自動で ssh-agent に登録する
+
+- `IdentitiesOnly yes`
+  指定した鍵だけを使う
+
+## 7. SSH AGENT永続化
+
+- `keychain`インストール
 
 ```bash
-256 SHA256:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX your_email@example.com (ED25519)
+sudo apt update
+sudo apt install keychain
 ```
 
-6. SSH エージェントの自動起動
+- `.bashrc`に以下を追加
 
-毎回手動で SSH エージェントを起動するのは面倒なので、Ubuntu 起動時に自動化します。
-
-```zsh title=".zshrc"
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519 > /dev/null 2>&1
-ssh-add -L
+```bash
+if command -v keychain >/dev/null 2>&1; then
+  eval $(keychain --eval ~/.ssh/github)
+fi
 ```
 
 ## 参考サイト
 
 <LinkCard url="https://docs.github.com/ja/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent" />
-
-<LinkCard url="https://zenn.dev/perilla/scraps/351f43bfcd13ec" />
