@@ -1,0 +1,36 @@
+---
+import { render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import LinkCard from "../../components/LinkCard.astro";
+import Publish from "../../components/Publish.astro";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import { getPosts, type Post } from "../../lib/posts";
+
+export const getStaticPaths = (async () => {
+	const posts = await getPosts();
+	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+type Props = { post: Post };
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogLayout title={post.data.title} desc={post.data.description} slug={post.id}>
+	<article class="bg-card rounded-[16px] px-4 md:px-9 pt-6 pb-4 flex flex-col gap-4">
+		<div class="relative">
+			<h1
+				class="text-2xl md:text-4xl font-bold md:before:w-1 md:before:h-5 md:before:rounded-md md:before:bg-primary md:before:absolute md:before:top-3 md:before:-left-4.5"
+			>
+				{post.data.title}
+			</h1>
+		</div>
+		<Publish
+			published_at={post.data.published_at}
+			modified={post.data.modified}
+			tags={post.data.tags}
+		/>
+		<div class="markdown"><Content components={{ LinkCard }} /></div>
+	</article>
+</BlogLayout>

@@ -1,0 +1,24 @@
+---
+import Footer from "../components/Footer.astro";
+import Head from "../components/Head.astro";
+
+type Props = {
+	title?: string;
+	desc?: string;
+	slug?: string;
+};
+
+const { title, desc, slug } = Astro.props;
+---
+
+<html lang="ja">
+	<head>
+		<Head title={title} desc={desc} slug={slug} />
+	</head>
+	<body>
+		<div class="grid grid-rows-[1fr_auto] gap-6 min-h-dvh max-w-[600px] mx-auto">
+			<main class="min-w-0"><slot /></main>
+			<Footer />
+		</div>
+	</body>
+</html>

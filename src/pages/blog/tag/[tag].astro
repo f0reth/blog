@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from "astro";
+import { allTags, type Tag } from "../../../../site.config";
+import PostList from "../../../components/PostList.astro";
+import BlogLayout from "../../../layouts/BlogLayout.astro";
+import { getPostsByTag } from "../../../lib/posts";
+
+export const getStaticPaths = (() =>
+	allTags.map((tag) => ({ params: { tag: tag.id } }))) satisfies GetStaticPaths;
+
+const tag = Astro.params.tag as Tag;
+const posts = await getPostsByTag(tag);
+---
+
+<BlogLayout>
+	<PostList posts={posts} />
+</BlogLayout>

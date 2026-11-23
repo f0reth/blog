@@ -1,0 +1,43 @@
+---
+import { createHash } from "node:crypto";
+import { SiteConfig } from "../../site.config";
+import themeScript from "../scripts/theme.js?raw";
+import "../styles/style.css";
+
+type Props = {
+	title?: string;
+	desc?: string;
+	slug?: string;
+};
+
+const { title, desc, slug } = Astro.props;
+
+const currentUrl = "https://daichi2mori.com";
+const pageTitle = title ? `${title} - ${SiteConfig.blogName}` : SiteConfig.blogName;
+const description = desc ?? SiteConfig.description;
+const ogpPath = slug ? `ogps/${slug}.png` : "ogp.png";
+
+// インラインのテーマ切替スクリプトを CSP で許可するためにハッシュを登録する
+const themeScriptHash = createHash("sha256").update(themeScript).digest("base64");
+Astro.csp?.insertScriptHash(`sha256-${themeScriptHash}`);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<meta property="og:url" content={currentUrl} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:site_name" content={pageTitle} />
+<meta property="og:image" content={`${currentUrl}/${ogpPath}`} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@daichi2mori" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={`${currentUrl}/${ogpPath}`} />
+<link rel="icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<script is:inline set:html={themeScript} />
