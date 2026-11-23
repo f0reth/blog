@@ -40,23 +40,23 @@ gcc は winget でインストールできないみたいなので、公式サ�
 
 画面左側にある`MinGW-w64 based`の EXE ファイルをダウンロードします。
 
-![gccのインストール場所](/static/gcc.avif)
+![gccのインストール場所](./gcc.avif)
 
 ダウンロード後、EXE ファイルを起動するとセットアップ画面が開きますので、「Create」をクリックします。
 
-![gccのセットアップ](/static/gcc-setup.avif)
+![gccのセットアップ](./gcc-setup.avif)
 
 64bit が選択されていることを確認してから「Next」をクリックします。
 
-![gccのインストールbit](/static/gcc-64bit.avif)
+![gccのインストールbit](./gcc-64bit.avif)
 
 インストール先は特に理由がなければ C ドライブにインストールするのがいいと思います。
 
-![gccのインストール先](/static/gcc-install-directory.avif)
+![gccのインストール先](./gcc-install-directory.avif)
 
 インストールするコンポーネントはデフォルトのままで大丈夫です。
 
-![gccのインストールするコンポーネント](/static/gcc-install-components.avif)
+![gccのインストールするコンポーネント](./gcc-install-components.avif)
 
 インストール完了後ターミナルを再起動してから、gcc のインストール確認をします。
 

@@ -35,7 +35,8 @@ tags: ["javascript"]
 pnpm add turbo --save-dev --ignore-workspace-root-check
 ```
 
-> [!IMPORTANT] > `turbo`は開発者用ツールであり、ワークスペース全体で利用することを想定しているため、
+> [!IMPORTANT]
+> `turbo`は開発者用ツールであり、ワークスペース全体で利用することを想定しているため、
 > ワークスペースのルートに追加するのが一般的ですが、`pnpm`はデフォルトで禁止しています。
 > このような場合に`--ignore-workspace-root-check`を使用することで制限を無視してインストールできます。
 > `npm`を使用する場合には関係ありません。
@@ -79,7 +80,8 @@ pnpm add turbo --save-dev --ignore-workspace-root-check
 }
 ```
 
-> [!TIP] > `package.json`の`nameフィールド`はワークスペース内で一意でなければならないです。
+> [!TIP]
+> `package.json`の`nameフィールド`はワークスペース内で一意でなければならないです。
 > そのためパッケージ名を`@organization-name/package-name`とするのがベストプラクティスです。
 
 > [!CAUTION]

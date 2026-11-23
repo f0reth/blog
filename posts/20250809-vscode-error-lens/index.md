@@ -9,7 +9,7 @@ tags: ["vscode"]
 
 ## Error Lens
 
-![Image](/static/error-lens.png)
+![Image](./error-lens.png)
 
 言語の診断結果を目立つように、その行全体をハイライト表示する拡張機能です。
 この拡張機能を入れるだけで、エラー箇所がかなりわかりやすくなります。
@@ -72,7 +72,7 @@ tags: ["vscode"]
 
 ## Statusbar error
 
-![Image](/static/statusbar-error.gif)
+![Image](./statusbar-error.gif)
 
 こちらはエラーの表示を行全体ではなく、色付きの文字で表示します。
 
