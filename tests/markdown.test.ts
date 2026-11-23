@@ -53,6 +53,14 @@ describe.each([
 		const tokens = pre?.querySelectorAll("span[style*='color']");
 		expect(tokens?.length).toBeGreaterThan(0);
 	});
+
+	test("コードブロックにコピーボタンを追加する", () => {
+		const button = document.querySelector(
+			"figure[data-rehype-pretty-code-figure] > button.copy-button",
+		);
+		expect(button?.getAttribute("type")).toBe("button");
+		expect(button?.getAttribute("aria-label")).toBe("コードをコピー");
+	});
 });
 
 describe("MDX 内の <LinkCard>", () => {

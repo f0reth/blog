@@ -27,3 +27,9 @@ const { Content } = await render(post);
 		<div class="markdown"><Content components={{ LinkCard }} /></div>
 	</article>
 </BlogLayout>
+
+<script>
+	import { setupCopyButtons } from "../../scripts/copyCode";
+
+	setupCopyButtons();
+</script>

@@ -48,7 +48,43 @@
 }
 
 .markdown > figure[data-rehype-pretty-code-figure] {
-  @apply my-5;
+  @apply relative my-5;
+}
+
+/* コードの右上に表示する。タイトル (figcaption) がある場合はその高さ (2rem) だけ下げる */
+.markdown .copy-button {
+  @apply absolute top-2 right-2 grid place-items-center size-8 rounded-md cursor-pointer
+    border border-zinc-600 bg-zinc-800 text-zinc-300 transition
+    hover:bg-zinc-700 hover:text-white;
+}
+
+.markdown figure:has(figcaption) > .copy-button {
+  @apply top-10;
+}
+
+/* ホバーできる端末ではコードブロックにカーソルを合わせたときだけ表示する */
+@media (hover: hover) {
+  .markdown .copy-button {
+    @apply opacity-0;
+  }
+
+  .markdown figure:hover > .copy-button,
+  .markdown .copy-button:focus-visible {
+    @apply opacity-100;
+  }
+}
+
+.markdown .copy-button svg {
+  @apply size-4;
+}
+
+.markdown .copy-button[data-copied] .copy-icon,
+.markdown .copy-button:not([data-copied]) .check-icon {
+  @apply hidden;
+}
+
+.markdown .copy-button[data-copied] {
+  @apply text-green-400;
 }
 
 .markdown > figure > figcaption[data-rehype-pretty-code-title] {

@@ -9,4 +9,8 @@ title: markdown fixture
 
 ```go
 package main
+
+func main() {
+	println("hello")
+}
 ```

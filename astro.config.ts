@@ -6,6 +6,7 @@ import rehypeExternalLinks from "rehype-external-links";
 import rehypePrettyCode from "rehype-pretty-code";
 import { remarkAlert } from "remark-github-blockquote-alert";
 import { SiteConfig } from "./site.config";
+import { rehypeCopyButton } from "./src/lib/rehypeCopyButton";
 
 export default defineConfig({
 	site: SiteConfig.url,
@@ -31,6 +32,7 @@ export default defineConfig({
 			rehypePlugins: [
 				[rehypeExternalLinks, { rel: ["noreferrer"], target: ["_blank"] }],
 				[rehypePrettyCode, { theme: "dark-plus", keepBackground: false }],
+				rehypeCopyButton,
 			],
 		}),
 	},
