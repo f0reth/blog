@@ -4,10 +4,10 @@ import { $, write } from "bun";
 // slug入力
 const slug = await text({
 	message: "記事のslugを入力してください",
-	placeholder: "honox-saiko", // デフォルト値
+	placeholder: "astro-saiko", // 入力例 (@clack/prompts v1 以降は値として入力されない)
 	validate(value) {
 		// バリデーション
-		if (value.length < 5) return "slugが短すぎます";
+		if (!value || value.length < 5) return "slugが短すぎます";
 	},
 });
 
@@ -45,7 +45,7 @@ description:
 published_at: "${today}"
 modified:
 published: true
-tags: [""]
+tags: []
 ---
 `;
 

@@ -1,9 +1,0 @@
-name = "blog"
-pages_build_output_dir = "dist"
-compatibility_date = "2024-06-05"
-
-[vars]
-BUN_VERSION = "1.2.2"
-
-[env.production.vars]
-BUN_VERSION = "1.2.2"

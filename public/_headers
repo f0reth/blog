@@ -1,0 +1,14 @@
+# 旧 HonoX の secureHeaders ミドルウェアで設定していたヘッダー（CSP は Astro の security.csp で <meta> 出力）
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: fullscreen=(self), bluetooth=(), payment=(self), sync-xhr=(), camera=(), microphone=*, geolocation=*, usb=(self), gyroscope=(src)
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Origin-Agent-Cluster: ?1
+  X-DNS-Prefetch-Control: off
+  X-Download-Options: noopen
+  X-Permitted-Cross-Domain-Policies: none
+  X-XSS-Protection: 0
