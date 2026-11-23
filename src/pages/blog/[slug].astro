@@ -4,12 +4,9 @@ import type { GetStaticPaths } from "astro";
 import LinkCard from "../../components/LinkCard.astro";
 import Publish from "../../components/Publish.astro";
 import BlogLayout from "../../layouts/BlogLayout.astro";
-import { getPosts, type Post } from "../../lib/posts";
+import { getPostPaths, type Post } from "../../lib/posts";
 
-export const getStaticPaths = (async () => {
-	const posts = await getPosts();
-	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
-}) satisfies GetStaticPaths;
+export const getStaticPaths = getPostPaths satisfies GetStaticPaths;
 
 type Props = { post: Post };
 
@@ -26,11 +23,7 @@ const { Content } = await render(post);
 				{post.data.title}
 			</h1>
 		</div>
-		<Publish
-			published_at={post.data.published_at}
-			modified={post.data.modified}
-			tags={post.data.tags}
-		/>
+		<Publish {...post.data} />
 		<div class="markdown"><Content components={{ LinkCard }} /></div>
 	</article>
 </BlogLayout>

@@ -22,11 +22,7 @@ const { posts } = Astro.props;
 						<span class="absolute inset-0 md:hidden" />
 					</a>
 					<p class="text-sm md:text-base">{post.data.description}</p>
-					<Publish
-						published_at={post.data.published_at}
-						modified={post.data.modified}
-						tags={post.data.tags}
-					/>
+					<Publish {...post.data} />
 				</div>
 
 				<a
@@ -39,7 +35,6 @@ const { posts } = Astro.props;
 						height="24"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#09090b"
 						stroke-width="2"
 						class="stroke-primary"
 					>

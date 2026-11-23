@@ -1,5 +1,4 @@
 import { getCollection } from "astro:content";
-import type { APIContext } from "astro";
 import { JSDOM } from "jsdom";
 import { beforeAll, describe, expect, test } from "vitest";
 import { getPosts } from "../../src/lib/posts";
@@ -10,13 +9,13 @@ describe("/feed.xml", () => {
 	let feed: Document;
 
 	beforeAll(async () => {
-		response = await GET({} as APIContext);
+		response = await GET();
 		feed = new JSDOM(await response.text(), { contentType: "text/xml" }).window
 			.document;
 	});
 
 	test("XML として配信する", () => {
-		expect(response.headers.get("Content-Type")).toBe("text/xml");
+		expect(response.headers.get("Content-Type")).toBe("application/xml");
 		expect(feed.documentElement.nodeName).toBe("rss");
 	});
 

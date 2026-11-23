@@ -1,5 +1,5 @@
 {
-	"name": "basic",
+	"name": "blog",
 	"type": "module",
 	"scripts": {
 		"dev": "astro dev",
@@ -8,17 +8,17 @@
 		"deploy": "astro build && wrangler deploy",
 		"check": "astro check",
 		"test": "astro sync && vitest run",
-		"create": "bun run create-article.ts"
+		"create": "bun create-article.ts"
 	},
 	"private": true,
 	"dependencies": {
 		"@astrojs/markdown-remark": "^7.3.10",
 		"@astrojs/mdx": "^8.1.6",
+		"@astrojs/rss": "^4.0.19",
 		"@resvg/resvg-js": "^2.6.2",
 		"astro": "^7.4.13",
 		"budoux": "^0.10.4",
-		"feed": "^6.0.0",
-		"jsdom": "^31.0.1",
+		"node-html-parser": "^9.0.7",
 		"rehype-external-links": "^3.0.0",
 		"rehype-pretty-code": "^0.14.6",
 		"remark-github-blockquote-alert": "^2.1.1",
@@ -32,6 +32,7 @@
 		"@tailwindcss/vite": "^4.3.5",
 		"@types/bun": "^1.4.5",
 		"@types/jsdom": "^30.0.0",
+		"jsdom": "^31.0.1",
 		"tailwindcss": "^4.3.5",
 		"typescript": "^6.0.3",
 		"vitest": "^5.1.1",

@@ -5,12 +5,13 @@ import { defineConfig, passthroughImageService } from "astro/config";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypePrettyCode from "rehype-pretty-code";
 import { remarkAlert } from "remark-github-blockquote-alert";
+import { SiteConfig } from "./site.config";
 
 export default defineConfig({
-	site: "https://daichi2mori.com",
+	site: SiteConfig.url,
 	output: "static",
 	build: {
-		// HonoX(SSG) と同じ `blog.html` / `blog/<slug>.html` 形式で出力する
+		// `blog.html` / `blog/<slug>.html` 形式で出力する
 		format: "file",
 	},
 	integrations: [mdx()],

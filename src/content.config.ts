@@ -1,12 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
-import { allTags } from "../site.config";
-
-const tagIds = allTags.map((tag) => tag.id) as [
-	(typeof allTags)[number]["id"],
-	...(typeof allTags)[number]["id"][],
-];
+import { tagIds } from "../site.config";
 
 const posts = defineCollection({
 	// posts/<slug>/index.md(x) を読み込み、ディレクトリ名を slug(id) として扱う
@@ -18,8 +13,9 @@ const posts = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		description: z.string(),
-		published_at: z.string(),
-		modified: z.string().nullish(),
+		// YYYY-MM-DD 形式の文字列のまま扱う (文字列比較で日付順に並べられる)
+		published_at: z.iso.date(),
+		modified: z.iso.date().nullish(),
 		published: z.boolean(),
 		tags: z.array(z.enum(tagIds)),
 	}),

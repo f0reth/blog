@@ -4,9 +4,12 @@ import Head from "../../src/components/Head.astro";
 import themeScript from "../../src/scripts/theme.js?raw";
 import { createContainer, parseHtml } from "../helpers/html";
 
-const render = async (props: Record<string, unknown>) => {
+const render = async (props: Record<string, unknown>, path = "/") => {
 	const container = await createContainer();
-	const html = await container.renderToString(Head, { props });
+	const html = await container.renderToString(Head, {
+		props,
+		request: new Request(new URL(path, "http://localhost")),
+	});
 	// <head> の中身として解釈させる
 	return parseHtml(`<html><head>${html}</head></html>`);
 };
@@ -34,6 +37,24 @@ describe("Head", () => {
 		expect(meta(document, 'name="twitter:image"')).toBe(
 			"https://daichi2mori.com/ogps/20240714-bun-sqlite.png",
 		);
+	});
+
+	test("og:url はビルド時の .html 付きパスではなく公開 URL を指す", async () => {
+		const ogUrl = async (path: string) =>
+			meta(await render({}, path), 'property="og:url"');
+
+		expect(await ogUrl("/index.html")).toBe("https://daichi2mori.com/");
+		expect(await ogUrl("/blog.html")).toBe("https://daichi2mori.com/blog");
+		expect(await ogUrl("/blog/20240714-bun-sqlite.html")).toBe(
+			"https://daichi2mori.com/blog/20240714-bun-sqlite",
+		);
+	});
+
+	test("記事ページの og:type は article、それ以外は website", async () => {
+		expect(meta(await render({ slug: "x" }), 'property="og:type"')).toBe(
+			"article",
+		);
+		expect(meta(await render({}), 'property="og:type"')).toBe("website");
 	});
 
 	test("記事以外のページではサイト名・サイトの説明・共通の OGP 画像を使う", async () => {

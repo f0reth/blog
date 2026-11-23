@@ -1,4 +1,4 @@
-# 旧 HonoX の secureHeaders ミドルウェアで設定していたヘッダー（CSP は Astro の security.csp で <meta> 出力）
+# セキュリティ関連のレスポンスヘッダー（CSP は Astro の security.csp で <meta> として出力する）
 /*
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   Permissions-Policy: fullscreen=(self), bluetooth=(), payment=(self), sync-xhr=(), camera=(), microphone=*, geolocation=*, usb=(self), gyroscope=(src)

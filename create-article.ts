@@ -1,45 +1,36 @@
+import { mkdir, writeFile } from "node:fs/promises";
 import { cancel, isCancel, outro, select, text } from "@clack/prompts";
-import { $, write } from "bun";
 
-// slug入力
+// never を返す関数宣言にすることで、呼び出し後に isCancel の型の絞り込みが効く
+function exit(): never {
+	cancel("goodbye");
+	process.exit(0);
+}
+
 const slug = await text({
 	message: "記事のslugを入力してください",
-	placeholder: "astro-saiko", // 入力例 (@clack/prompts v1 以降は値として入力されない)
-	validate(value) {
-		// バリデーション
-		if (!value || value.length < 5) return "slugが短すぎます";
-	},
+	placeholder: "astro-saiko",
+	validate: (value) =>
+		!value || value.length < 5 ? "slugが短すぎます" : undefined,
 });
+if (isCancel(slug)) exit();
 
-if (isCancel(slug)) {
-	cancel("goodbye");
-}
-
-// 作成時の日付を取得
-const today = new Date()
-	.toLocaleDateString("ja-JP", {
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-	})
-	.replaceAll("/", "-");
-
-// 拡張子選択
 const extension = await select({
 	message: "作成するファイル拡張子を選択してください",
-	options: [
-		{ value: "md", label: "md" },
-		{ value: "mdx", label: "mdx" },
-	],
+	options: [{ value: "md" }, { value: "mdx" }],
 });
+if (isCancel(extension)) exit();
 
-if (isCancel(extension)) {
-	cancel("goodbye");
-}
+// ローカルタイムゾーンの日付を YYYY-MM-DD で取得する (sv-SE ロケールは ISO 形式で出力される)
+const today = new Date().toLocaleDateString("sv-SE");
+const dir = `posts/${today.replaceAll("-", "")}-${slug}`;
+const path = `${dir}/index.${extension}`;
 
-const dirname = `${today.replaceAll("-", "")}-${String(slug)}`;
-const createFilePath = `./posts/${dirname}/index.${String(extension)}`;
-const frontmatter = `---
+// 同名のディレクトリがあればエラーにして既存の記事を上書きしない
+await mkdir(dir);
+await writeFile(
+	path,
+	`---
 title:
 description:
 published_at: "${today}"
@@ -47,10 +38,7 @@ modified:
 published: true
 tags: []
 ---
-`;
+`,
+);
 
-await $`mkdir ./posts/${dirname}`;
-await $`touch ${createFilePath}`;
-await write(createFilePath, frontmatter);
-
-outro(`./posts/${dirname}/index.md is created`);
+outro(`${path} を作成しました`);

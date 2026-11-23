@@ -1,28 +1,18 @@
 ---
+import type { ComponentProps } from "astro/types";
 import Footer from "../components/Footer.astro";
-import Head from "../components/Head.astro";
 import Header from "../components/Header.astro";
+import BaseLayout from "./BaseLayout.astro";
 
-type Props = {
-	title?: string;
-	desc?: string;
-	slug?: string;
-};
-
-const { title, desc, slug } = Astro.props;
+type Props = ComponentProps<typeof BaseLayout>;
 ---
 
-<html lang="ja">
-	<head>
-		<Head title={title} desc={desc} slug={slug} />
-	</head>
-	<body>
-		<div
-			class="grid grid-rows-[auto_1fr_auto] gap-4 min-h-dvh max-w-[1000px] my-0 mx-auto md:px-4"
-		>
-			<Header />
-			<main class="min-w-0"><slot /></main>
-			<Footer />
-		</div>
-	</body>
-</html>
+<BaseLayout {...Astro.props}>
+	<div
+		class="grid grid-rows-[auto_1fr_auto] gap-4 min-h-dvh max-w-[1000px] mx-auto md:px-4"
+	>
+		<Header />
+		<main class="min-w-0"><slot /></main>
+		<Footer />
+	</div>
+</BaseLayout>

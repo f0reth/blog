@@ -4,21 +4,24 @@ export const SiteConfig = {
 	url: "https://daichi2mori.com/",
 };
 
-export const allTags = [
-	{ id: "markdown", label: "Markdown" },
-	{ id: "windows", label: "Windows" },
-	{ id: "github", label: "GitHub" },
-	{ id: "bun", label: "Bun" },
-	{ id: "sqlite", label: "SQLite" },
-	{ id: "golang", label: "Go言語" },
-	{ id: "vscode", label: "VSCode" },
-	{ id: "linux", label: "Linux" },
-	{ id: "ubuntu", label: "Ubuntu" },
-	{ id: "react", label: "React" },
-	{ id: "vite", label: "Vite" },
-	{ id: "css", label: "CSS" },
-	{ id: "javascript", label: "JavaScript" },
-	{ id: "python", label: "Python" },
-] as const;
+/** タグ ID と表示名。記事の frontmatter の tags はここに定義した ID だけを受け付ける */
+export const tags = {
+	markdown: "Markdown",
+	windows: "Windows",
+	github: "GitHub",
+	bun: "Bun",
+	sqlite: "SQLite",
+	golang: "Go言語",
+	vscode: "VSCode",
+	linux: "Linux",
+	ubuntu: "Ubuntu",
+	react: "React",
+	vite: "Vite",
+	css: "CSS",
+	javascript: "JavaScript",
+	python: "Python",
+} as const;
 
-export type Tag = (typeof allTags)[number]["id"];
+export type Tag = keyof typeof tags;
+
+export const tagIds = Object.keys(tags) as [Tag, ...Tag[]];

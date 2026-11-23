@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { allTags } from "../../site.config";
+import { tagIds } from "../../site.config";
 import { getPosts, getPostsByTag } from "../../src/lib/posts";
 import ArticlePage, {
 	getStaticPaths as getArticlePaths,
@@ -38,12 +38,10 @@ describe("/blog", () => {
 
 describe("/blog/tag/[tag]", () => {
 	test("site.config.ts の全タグのページを生成する", () => {
-		expect(getTagPaths().map((path) => path.params.tag)).toEqual(
-			allTags.map((tag) => tag.id),
-		);
+		expect(getTagPaths().map((path) => path.params.tag)).toEqual(tagIds);
 	});
 
-	test.each(allTags.map((tag) => tag.id))(
+	test.each(tagIds)(
 		"%s: そのタグを持つ公開記事だけを一覧表示する",
 		async (tag) => {
 			const container = await createContainer();

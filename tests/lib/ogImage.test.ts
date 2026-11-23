@@ -104,7 +104,7 @@ describe("renderOgImage", () => {
 		const cssUrl = requestedUrls(fetchMock).find((url) =>
 			url.startsWith(FONT_CSS_URL),
 		);
-		expect(cssUrl).toContain("family=Noto%20Sans%20JP:wght@600");
+		expect(cssUrl).toContain("family=Noto+Sans+JP:wght@600");
 		expect(requestedUrls(fetchMock)).toContain(FONT_FILE_URL);
 	});
 

@@ -35,6 +35,21 @@ describe("fetchOgp", () => {
 				`),
 			},
 			"/bare": { body: page("") },
+			// "<title>テスト</title>" を Shift_JIS でエンコードしたもの
+			"/shift-jis": {
+				contentType: "text/html; charset=Shift_JIS",
+				body: new Uint8Array([
+					...new TextEncoder().encode("<title>"),
+					0x83,
+					0x65,
+					0x83,
+					0x58,
+					0x83,
+					0x67,
+					...new TextEncoder().encode("</title>"),
+				]),
+			},
+			"/cached": { body: page("<title>キャッシュ</title>") },
 			"/error": { status: 500, body: page("<title>Server Error</title>") },
 		});
 	});
@@ -83,6 +98,23 @@ describe("fetchOgp", () => {
 			host: server.host,
 			favicon: `https://www.google.com/s2/favicons?domain=${server.host}`,
 		});
+	});
+
+	test("Content-Type の charset に従ってデコードする (Shift_JIS のページも文字化けしない)", async () => {
+		const ogp = await fetchOgp(`${server.origin}/shift-jis`);
+
+		expect(ogp.title).toBe("テスト");
+	});
+
+	test("同じ URL の OGP はビルド中に 1 回だけ取得する", async () => {
+		const url = `${server.origin}/cached`;
+		const [a, b] = await Promise.all([fetchOgp(url), fetchOgp(url)]);
+		const c = await fetchOgp(url);
+
+		expect(a.title).toBe("キャッシュ");
+		expect(b).toBe(a);
+		expect(c).toBe(a);
+		expect(server.requestCount("/cached")).toBe(1);
 	});
 
 	test("取得に失敗した場合はビルドを止めずにエラーを出力し、host と favicon だけを返す", async () => {

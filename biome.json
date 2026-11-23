@@ -35,19 +35,6 @@
 	},
 	"overrides": [
 		{
-			"includes": ["src/styles/admonitions.css"],
-			"linter": {
-				"rules": {
-					"complexity": {
-						"noImportantStyles": "off"
-					},
-					"suspicious": {
-						"noDuplicateProperties": "off"
-					}
-				}
-			}
-		},
-		{
 			"includes": ["**/*.astro"],
 			"linter": {
 				"rules": {

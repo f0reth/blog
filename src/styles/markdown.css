@@ -10,14 +10,7 @@
   @apply mt-1;
 }
 
-.markdown li > p + p {
-  @apply mt-6;
-}
-
-.markdown strong {
-  @apply font-bold;
-}
-
+.markdown strong,
 .markdown strong a {
   @apply font-bold;
 }
@@ -26,12 +19,16 @@
   @apply text-base leading-7 mt-3 mb-0;
 }
 
+.markdown li > p + p {
+  @apply mt-6;
+}
+
 .markdown h1 {
-  @apply leading-tight text-3xl mb-0 mt-12 pb-1.5 font-bold border-b dark:border-gray-400;
+  @apply leading-tight text-3xl mb-0 mt-12 pb-1.5 font-bold border-b border-gray-200 dark:border-gray-400;
 }
 
 .markdown h2 {
-  @apply leading-tight text-2xl mt-10 mb-4 pb-1.5 font-bold border-b dark:border-gray-400;
+  @apply leading-tight text-2xl mt-10 mb-4 pb-1.5 font-bold border-b border-gray-200 dark:border-gray-400;
 }
 
 .markdown h3 {
@@ -70,15 +67,8 @@
   @apply text-sm cursor-text;
 }
 
-.markdown p > code {
-  @apply inline px-1.5 py-1 mx-0.5 bg-background dark:bg-slate-700 rounded;
-}
-
-.markdown ul > li > code {
-  @apply inline px-1.5 py-1 mx-0.5 bg-background dark:bg-slate-700 rounded;
-}
-
-.markdown ol > li > code {
+.markdown p > code,
+.markdown li > code {
   @apply inline px-1.5 py-1 mx-0.5 bg-background dark:bg-slate-700 rounded;
 }
 
@@ -105,19 +95,20 @@
 }
 
 .markdown kbd {
-  @apply text-xs inline-block border px-1 py-5 align-middle font-normal font-mono shadow-sm;
+  @apply text-xs inline-block border border-gray-200 px-1 py-5 align-middle font-normal font-mono shadow-sm;
 }
 
 .markdown table {
-  @apply text-base border-gray-600;
+  @apply text-base;
 }
 
-.markdown th {
-  @apply border py-1 px-3;
-}
-
+.markdown th,
 .markdown td {
-  @apply border py-1 px-3;
+  @apply border border-gray-200 py-1 px-3;
+}
+
+.markdown hr {
+  @apply border-gray-200;
 }
 
 .markdown > p:has(img) {

@@ -10,28 +10,19 @@ const postDirs = readdirSync(postsDir, { withFileTypes: true })
 
 const posts = await getCollection("posts");
 
-const isValidDate = (value: string) => {
-	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-	const date = new Date(`${value}T00:00:00Z`);
-	return date.toISOString().startsWith(value);
-};
-
 describe("posts/ の記事", () => {
 	test("posts/ 配下のすべてのディレクトリが記事として読み込まれる (index.md(x) の置き忘れ・命名ミスがない)", () => {
 		expect(posts.map((post) => post.id).sort()).toEqual(postDirs);
 	});
 
-	test.each(posts.map((post) => [post.id, post] as const))(
-		"%s: 日付が YYYY-MM-DD 形式の実在する日付である",
-		(_id, post) => {
-			// 並び替えは published_at を数値化して行うため、ゼロ埋めされた形式でなければ順序が壊れる
-			expect(isValidDate(post.data.published_at)).toBe(true);
-			if (post.data.modified) {
-				expect(isValidDate(post.data.modified)).toBe(true);
-				expect(post.data.modified >= post.data.published_at).toBe(true);
-			}
-		},
-	);
+	// 日付の形式 (YYYY-MM-DD) は content.config.ts のスキーマで検証している
+	test.each(
+		posts.flatMap(({ id, data }) =>
+			data.modified ? [[id, data.published_at, data.modified] as const] : [],
+		),
+	)("%s: 最終編集日が投稿日以降である", (_id, publishedAt, modified) => {
+		expect(modified >= publishedAt).toBe(true);
+	});
 
 	test.each(posts.map((post) => [post.id, post] as const))(
 		"%s: ディレクトリ名の日付が published_at と一致する",
