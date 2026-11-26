@@ -13,6 +13,7 @@ import TagPage, {
 } from "../../src/pages/tags/[tag].astro";
 import TagsPage from "../../src/pages/tags/index.astro";
 import { parseHtml, renderHtml } from "../helpers/html";
+import { nonEmpty } from "../helpers/posts";
 
 // 記事内の <LinkCard> はビルド時に外部サイトへアクセスするため、ページのテストでは描画しない
 vi.mock("../../src/components/LinkCard.astro", async () => ({
@@ -25,8 +26,12 @@ const renderPage = async (
 ) => parseHtml(await renderHtml(page, options));
 
 // 一覧の期待値は getPosts() を使わずに求め、並び順は表示された日付で検証する
-const published = await getCollection("posts", ({ data }) => data.published);
-const drafts = await getCollection("posts", ({ data }) => !data.published);
+const published = nonEmpty(
+	await getCollection("posts", ({ data }) => data.published),
+);
+const drafts = nonEmpty(
+	await getCollection("posts", ({ data }) => !data.published),
+);
 
 /** 記事一覧 (PostList) に並んだ記事 */
 const listedPosts = (document: Document) =>
@@ -172,7 +177,7 @@ describe("/about", () => {
 
 describe("/blog/[slug]", async () => {
 	const paths = await getArticlePaths();
-	const posts = await getPosts();
+	const posts = nonEmpty(await getPosts());
 
 	test("公開記事ごとにページを生成する", () => {
 		expect(paths.map((path) => path.params.slug)).toEqual(

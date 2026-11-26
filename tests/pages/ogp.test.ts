@@ -10,6 +10,7 @@ import {
 	getStaticPaths,
 } from "../../src/pages/ogps/[slug].png";
 import { createContainer, parseHtml } from "../helpers/html";
+import { nonEmpty } from "../helpers/posts";
 
 // 画像の描画自体は tests/lib/ogImage.test.ts で検証済みのため、ここではルーティングだけを見る
 vi.mock("../../src/lib/ogImage", () => ({
@@ -42,7 +43,7 @@ describe("/ogp.png", () => {
 
 describe("/ogps/[slug].png", () => {
 	test("公開記事ごとに、記事ページの og:image が指す画像を生成する", async () => {
-		const posts = await getPosts();
+		const posts = nonEmpty(await getPosts());
 		const paths = await getStaticPaths();
 
 		expect(paths.map((path) => `/ogps/${path.params.slug}.png`)).toEqual(

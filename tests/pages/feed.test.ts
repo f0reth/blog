@@ -3,6 +3,7 @@ import { JSDOM } from "jsdom";
 import { beforeAll, describe, expect, test } from "vitest";
 import { getPosts } from "../../src/lib/posts";
 import { GET } from "../../src/pages/feed.xml";
+import { nonEmpty } from "../helpers/posts";
 
 describe("/feed.xml", () => {
 	let response: Response;
@@ -31,7 +32,7 @@ describe("/feed.xml", () => {
 	});
 
 	test("公開記事だけを新しい順に、記事ページへのリンク付きで掲載する", async () => {
-		const posts = await getPosts();
+		const posts = nonEmpty(await getPosts());
 		const items = [...feed.querySelectorAll("item")].map((item) => ({
 			title: item.querySelector("title")?.textContent,
 			link: item.querySelector("link")?.textContent,
@@ -48,7 +49,9 @@ describe("/feed.xml", () => {
 			})),
 		);
 
-		const drafts = await getCollection("posts", ({ data }) => !data.published);
+		const drafts = nonEmpty(
+			await getCollection("posts", ({ data }) => !data.published),
+		);
 		const links = items.map((item) => item.link);
 		for (const draft of drafts) {
 			expect(links).not.toContain(`https://daichi2mori.com/blog/${draft.id}`);

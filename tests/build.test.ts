@@ -5,6 +5,7 @@ import { describe, expect, test } from "vitest";
 import { SiteConfig } from "../site.config";
 import { getPosts } from "../src/lib/posts";
 import { parseHtml } from "./helpers/html";
+import { nonEmpty } from "./helpers/posts";
 
 // `bun run test` が直前に実行する astro build の成果物 (Workers Static Assets として配信されるもの) を検証する
 const dist = new URL("../dist/", import.meta.url);
@@ -38,7 +39,7 @@ const pages = readdirSync(dist, { recursive: true, encoding: "utf8" })
 	.sort()
 	.map((file) => [file, parseHtml(read(file).toString())] as const);
 
-const posts = await getPosts();
+const posts = nonEmpty(await getPosts());
 
 describe("ビルド成果物", () => {
 	test("公開記事ごとに記事ページと OGP 画像 (1200x630 の PNG) を出力し、下書きは出力しない", async () => {
@@ -51,7 +52,9 @@ describe("ビルド成果物", () => {
 			});
 		}
 
-		const drafts = await getCollection("posts", ({ data }) => !data.published);
+		const drafts = nonEmpty(
+			await getCollection("posts", ({ data }) => !data.published),
+		);
 		for (const draft of drafts) {
 			expect(exists(`/blog/${draft.id}.html`), draft.id).toBe(false);
 			expect(exists(`/ogps/${draft.id}.png`), draft.id).toBe(false);
