@@ -5,7 +5,7 @@ import { getViteConfig } from "astro/config";
 export default getViteConfig({
 	test: {
 		include: ["tests/**/*.test.ts"],
-		// 変換済みモジュールのキャッシュは astro.config.mjs の変更 (markdown プラグインなど) を検知できず、
+		// 変換済みモジュールのキャッシュは astro.config.ts の変更 (markdown プラグインなど) を検知できず、
 		// 古い変換結果でテストが通ってしまうため無効化する
 		fsModuleCache: false,
 	},
