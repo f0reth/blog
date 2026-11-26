@@ -21,7 +21,7 @@ export const openDom = (
 	{ systemDark = false, mobile = false, userAgent, storage = {} }: Options = {},
 ) => {
 	const dom = new JSDOM(html, {
-		url: "https://daichi2mori.com/",
+		url: "https://f0reth.net/",
 		// theme.js をページ内で実行するため (HTML 内の <script> は実行しない)
 		runScripts: "outside-only",
 	});

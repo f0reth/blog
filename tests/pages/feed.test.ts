@@ -26,7 +26,7 @@ describe("/feed.xml", () => {
 			"f0rethのブログ",
 		);
 		expect(channel?.querySelector(":scope > link")?.textContent).toBe(
-			"https://daichi2mori.com/",
+			"https://f0reth.net/",
 		);
 		expect(channel?.querySelector(":scope > language")?.textContent).toBe("ja");
 	});
@@ -43,7 +43,7 @@ describe("/feed.xml", () => {
 		expect(items).toEqual(
 			posts.map((post) => ({
 				title: post.data.title,
-				link: `https://daichi2mori.com/blog/${post.id}`,
+				link: `https://f0reth.net/blog/${post.id}`,
 				description: post.data.description,
 				pubDate: new Date(post.data.published_at).toUTCString(),
 			})),
@@ -54,7 +54,7 @@ describe("/feed.xml", () => {
 		);
 		const links = items.map((item) => item.link);
 		for (const draft of drafts) {
-			expect(links).not.toContain(`https://daichi2mori.com/blog/${draft.id}`);
+			expect(links).not.toContain(`https://f0reth.net/blog/${draft.id}`);
 		}
 	});
 });

@@ -193,7 +193,7 @@ describe("検索モーダル", () => {
 
 		page.keydown("Enter", {}, page.input);
 
-		expect(page.location.href).toBe("https://daichi2mori.com/");
+		expect(page.location.href).toBe("https://f0reth.net/");
 	});
 
 	test("パネルの外側をクリックすると閉じ、パネル内のクリックでは閉じない", async () => {

@@ -12,7 +12,7 @@ const openPage = ({ stored, systemDark }: Options) => {
 	const dom = new JSDOM(
 		"<!doctype html><html><head></head><body></body></html>",
 		{
-			url: "https://daichi2mori.com/",
+			url: "https://f0reth.net/",
 			runScripts: "outside-only",
 		},
 	);

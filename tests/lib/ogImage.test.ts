@@ -165,7 +165,7 @@ describe("renderOgImage", () => {
 		await renderOgImage("x");
 
 		expect(texts(satoriElements[0])).toEqual(
-			expect.arrayContaining([SiteConfig.blogName, "daichi2mori.com"]),
+			expect.arrayContaining([SiteConfig.blogName, "f0reth.net"]),
 		);
 	});
 

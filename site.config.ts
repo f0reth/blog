@@ -1,7 +1,7 @@
 export const SiteConfig = {
 	blogName: "f0reth",
 	description: "プログラミングや日常について投稿します",
-	url: "https://daichi2mori.com/",
+	url: "https://f0reth.net/",
 };
 
 /** タグ ID と表示名。記事の frontmatter の tags はここに定義した ID だけを受け付ける */

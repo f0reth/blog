@@ -36,10 +36,10 @@ describe("Head", () => {
 		);
 		expect(meta(document, 'name="twitter:description"')).toBe("記事の説明");
 		expect(meta(document, 'property="og:image"')).toBe(
-			"https://daichi2mori.com/ogps/20240714-bun-sqlite.png",
+			"https://f0reth.net/ogps/20240714-bun-sqlite.png",
 		);
 		expect(meta(document, 'name="twitter:image"')).toBe(
-			"https://daichi2mori.com/ogps/20240714-bun-sqlite.png",
+			"https://f0reth.net/ogps/20240714-bun-sqlite.png",
 		);
 	});
 
@@ -47,10 +47,10 @@ describe("Head", () => {
 		const ogUrl = async (path: string) =>
 			meta(await render({}, path), 'property="og:url"');
 
-		expect(await ogUrl("/index.html")).toBe("https://daichi2mori.com/");
-		expect(await ogUrl("/tags.html")).toBe("https://daichi2mori.com/tags");
+		expect(await ogUrl("/index.html")).toBe("https://f0reth.net/");
+		expect(await ogUrl("/tags.html")).toBe("https://f0reth.net/tags");
 		expect(await ogUrl("/blog/20240714-bun-sqlite.html")).toBe(
-			"https://daichi2mori.com/blog/20240714-bun-sqlite",
+			"https://f0reth.net/blog/20240714-bun-sqlite",
 		);
 	});
 
@@ -68,7 +68,7 @@ describe("Head", () => {
 		expect(meta(document, 'name="description"')).toBe(SiteConfig.description);
 		expect(meta(document, 'property="og:title"')).toBe(SiteConfig.blogName);
 		expect(meta(document, 'property="og:image"')).toBe(
-			"https://daichi2mori.com/ogp.png",
+			"https://f0reth.net/ogp.png",
 		);
 	});
 

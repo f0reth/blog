@@ -220,7 +220,7 @@ describe("/blog/[slug]", async () => {
 					document
 						.querySelector('meta[property="og:image"]')
 						?.getAttribute("content"),
-				).toBe(`https://daichi2mori.com/ogps/${slug}.png`);
+				).toBe(`https://f0reth.net/ogps/${slug}.png`);
 				expect(document.querySelector(".post-header h1")?.textContent).toBe(
 					title,
 				);
