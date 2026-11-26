@@ -25,11 +25,15 @@ describe("Head", () => {
 			slug: "20240714-bun-sqlite",
 		});
 
-		expect(document.title).toBe("Bun で SQLite - d2m");
+		expect(document.title).toBe("Bun で SQLite - f0reth");
 		expect(meta(document, 'name="description"')).toBe("記事の説明");
-		expect(meta(document, 'property="og:title"')).toBe("Bun で SQLite - d2m");
+		expect(meta(document, 'property="og:title"')).toBe(
+			"Bun で SQLite - f0reth",
+		);
 		expect(meta(document, 'property="og:description"')).toBe("記事の説明");
-		expect(meta(document, 'name="twitter:title"')).toBe("Bun で SQLite - d2m");
+		expect(meta(document, 'name="twitter:title"')).toBe(
+			"Bun で SQLite - f0reth",
+		);
 		expect(meta(document, 'name="twitter:description"')).toBe("記事の説明");
 		expect(meta(document, 'property="og:image"')).toBe(
 			"https://daichi2mori.com/ogps/20240714-bun-sqlite.png",

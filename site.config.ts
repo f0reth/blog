@@ -1,5 +1,5 @@
 export const SiteConfig = {
-	blogName: "d2m",
+	blogName: "f0reth",
 	description: "プログラミングや日常について投稿します",
 	url: "https://daichi2mori.com/",
 };

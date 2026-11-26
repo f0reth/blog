@@ -22,7 +22,7 @@ describe("/feed.xml", () => {
 	test("ブログの情報をチャンネルに設定する", () => {
 		const channel = feed.querySelector("channel");
 		expect(channel?.querySelector(":scope > title")?.textContent).toBe(
-			"d2mのブログ",
+			"f0rethのブログ",
 		);
 		expect(channel?.querySelector(":scope > link")?.textContent).toBe(
 			"https://daichi2mori.com/",
