@@ -14,3 +14,7 @@ func main() {
 	println("hello")
 }
 ```
+
+```ts
+const answer = 42;
+```

@@ -14,7 +14,13 @@ export const setupCopyButtons = () => {
 				line.childElementCount === 0 ? "" : line.textContent,
 			).join("\n");
 
-			await navigator.clipboard.writeText(text);
+			try {
+				await navigator.clipboard.writeText(text);
+			} catch (error) {
+				// 権限がない・ページが非アクティブなどで書き込めなかった場合は、コピー済みの表示にしない
+				console.error("Failed to copy code:", error);
+				return;
+			}
 
 			// コピーできたことを示すため、少しの間チェックアイコンに切り替える
 			button.dataset.copied = "";
