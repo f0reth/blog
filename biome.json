@@ -22,6 +22,9 @@
 			"correctness": {
 				"noUnusedImports": "error"
 			}
+		},
+		"domains": {
+			"playwright": "none"
 		}
 	},
 	"formatter": {
@@ -29,6 +32,14 @@
 		"includes": ["**/*.js", "**/*.mjs", "**/*.ts", "**/*.json", "**/*.jsonc"]
 	},
 	"overrides": [
+		{
+			"includes": ["e2e/**"],
+			"linter": {
+				"domains": {
+					"playwright": "recommended"
+				}
+			}
+		},
 		{
 			"includes": ["**/*.astro"],
 			"linter": {
