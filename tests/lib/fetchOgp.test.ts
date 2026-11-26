@@ -5,6 +5,14 @@ import { startHtmlServer } from "../helpers/html";
 const page = (head: string) =>
 	`<!doctype html><html><head>${head}</head><body></body></html>`;
 
+/** head の後に "<title>テスト</title>" を Shift_JIS でエンコードして続けたページ */
+const shiftJisPage = (head: string) =>
+	new Uint8Array([
+		...new TextEncoder().encode(`<html><head>${head}<title>`),
+		...[0x83, 0x65, 0x83, 0x58, 0x83, 0x67],
+		...new TextEncoder().encode("</title></head></html>"),
+	]);
+
 describe("fetchOgp", () => {
 	let server: Awaited<ReturnType<typeof startHtmlServer>>;
 
@@ -34,21 +42,25 @@ describe("fetchOgp", () => {
 					<meta property="og:description" content="">
 				`),
 			},
+			"/relative-image": {
+				body: page(`<meta property="og:image" content="/images/og.png">`),
+			},
 			"/bare": { body: page("") },
-			// "<title>テスト</title>" を Shift_JIS でエンコードしたもの
 			"/shift-jis": {
 				contentType: "text/html; charset=Shift_JIS",
-				body: new Uint8Array([
-					...new TextEncoder().encode("<title>"),
-					0x83,
-					0x65,
-					0x83,
-					0x58,
-					0x83,
-					0x67,
-					...new TextEncoder().encode("</title>"),
-				]),
+				body: shiftJisPage(""),
 			},
+			"/shift-jis-meta-charset": {
+				contentType: "text/html",
+				body: shiftJisPage('<meta charset="Shift_JIS">'),
+			},
+			"/shift-jis-http-equiv": {
+				contentType: "text/html",
+				body: shiftJisPage(
+					'<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">',
+				),
+			},
+			"/hang": { hang: true },
 			"/cached": { body: page("<title>キャッシュ</title>") },
 			"/error": { status: 500, body: page("<title>Server Error</title>") },
 		});
@@ -88,6 +100,12 @@ describe("fetchOgp", () => {
 		});
 	});
 
+	test("og:image が相対パスなら、リンク先ページを基準にした絶対 URL にする", async () => {
+		const ogp = await fetchOgp(`${server.origin}/relative-image`);
+
+		expect(ogp.image).toBe(`${server.origin}/images/og.png`);
+	});
+
 	test("メタ情報が何もないページでは host と favicon だけを返す", async () => {
 		const ogp = await fetchOgp(`${server.origin}/bare`);
 
@@ -105,6 +123,18 @@ describe("fetchOgp", () => {
 
 		expect(ogp.title).toBe("テスト");
 	});
+
+	test.each([
+		["<meta charset>", "/shift-jis-meta-charset"],
+		['<meta http-equiv="Content-Type">', "/shift-jis-http-equiv"],
+	])(
+		"Content-Type に charset がなければ HTML の %s に従ってデコードする",
+		async (_label, path) => {
+			const ogp = await fetchOgp(`${server.origin}${path}`);
+
+			expect(ogp.title).toBe("テスト");
+		},
+	);
 
 	test("同じ URL の OGP はビルド中に 1 回だけ取得する", async () => {
 		const url = `${server.origin}/cached`;
@@ -131,6 +161,32 @@ describe("fetchOgp", () => {
 		expect(consoleError).toHaveBeenCalledWith(
 			expect.stringContaining("Error fetching OGP data"),
 		);
+		consoleError.mockRestore();
+	});
+
+	test("応答のないサイトは 10 秒でタイムアウトさせ、ビルドを止めずに host と favicon だけを返す", async () => {
+		const consoleError = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
+		// 10 秒待たずに検証するため、タイムアウト用の signal を手動で中断できるものに差し替える
+		const controller = new AbortController();
+		const timeout = vi
+			.spyOn(AbortSignal, "timeout")
+			.mockReturnValue(controller.signal);
+
+		const pending = fetchOgp(`${server.origin}/hang`);
+		await vi.waitFor(() => expect(server.requestCount("/hang")).toBe(1));
+		controller.abort(new DOMException("timed out", "TimeoutError"));
+
+		expect(await pending).toStrictEqual({
+			host: server.host,
+			favicon: `https://www.google.com/s2/favicons?domain=${server.host}`,
+		});
+		expect(timeout).toHaveBeenCalledWith(10_000);
+		expect(consoleError).toHaveBeenCalledWith(
+			expect.stringContaining("timed out"),
+		);
+		timeout.mockRestore();
 		consoleError.mockRestore();
 	});
 });

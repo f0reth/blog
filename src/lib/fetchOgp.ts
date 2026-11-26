@@ -29,9 +29,13 @@ const scrapeOgp = async (url: string): Promise<Ogp> => {
 	};
 
 	try {
-		const document = parse(await fetchHtml(url));
+		const { html, responseUrl } = await fetchHtml(url);
+		const document = parse(html);
 		const content = (selector: string) =>
 			document.querySelector(selector)?.getAttribute("content") || undefined;
+		// og:image が相対パス ("/og.png" など) のサイトもあるため、取得したページの URL を基準に絶対 URL にする
+		const image =
+			content('meta[property="og:image"]') ?? content('meta[name="og:image"]');
 
 		return {
 			...ogp,
@@ -41,9 +45,7 @@ const scrapeOgp = async (url: string): Promise<Ogp> => {
 			description:
 				content('meta[property="og:description"]') ??
 				content('meta[name="description"]'),
-			image:
-				content('meta[property="og:image"]') ??
-				content('meta[name="og:image"]'),
+			image: image && new URL(image, responseUrl).href,
 		};
 	} catch (e) {
 		console.error(
@@ -59,9 +61,18 @@ const fetchHtml = async (url: string) => {
 	if (!response.ok) {
 		throw new Error(`HTTP ${response.status}`);
 	}
-	// Shift_JIS などで配信されるページも文字化けしないよう Content-Type の charset でデコードする
+	const body = await response.arrayBuffer();
+	// Shift_JIS などのページも文字化けしないよう、Content-Type の charset でデコードする。
+	// Content-Type に charset がなければ HTML 先頭の <meta charset> / <meta http-equiv="Content-Type"> に従う
 	const charset =
 		response.headers.get("content-type")?.match(/charset=([^;]+)/i)?.[1] ??
+		new TextDecoder("latin1")
+			.decode(body.slice(0, 1024))
+			.match(/<meta[^>]+charset=["']?([\w-]+)/i)?.[1] ??
 		"utf-8";
-	return new TextDecoder(charset.trim()).decode(await response.arrayBuffer());
+	return {
+		html: new TextDecoder(charset.trim()).decode(body),
+		// リダイレクトされた場合は転送先の URL
+		responseUrl: response.url,
+	};
 };

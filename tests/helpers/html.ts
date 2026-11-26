@@ -8,7 +8,9 @@ import { JSDOM } from "jsdom";
 type Route = {
 	status?: number;
 	contentType?: string;
-	body: string | Uint8Array;
+	/** 応答を返さない (タイムアウトの検証用) */
+	hang?: boolean;
+	body?: string | Uint8Array;
 };
 
 /** LinkCard / fetchOgp が実際に HTTP で取得しに行く先として使うローカルサーバー */
@@ -19,6 +21,7 @@ export const startHtmlServer = async (routes: Record<string, Route>) => {
 		const url = req.url ?? "";
 		requests.set(url, (requests.get(url) ?? 0) + 1);
 		const route = routes[url];
+		if (route?.hang) return;
 		res.writeHead(route?.status ?? (route ? 200 : 404), {
 			"Content-Type": route?.contentType ?? "text/html; charset=utf-8",
 		});
