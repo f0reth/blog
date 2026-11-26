@@ -1,0 +1,363 @@
+---
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+	/** 記事ページの目次。渡されたときだけ Contents の項目を出す */
+	headings?: MarkdownHeading[];
+};
+
+const { headings = [] } = Astro.props;
+
+// icon は 24x24 の SVG パス
+const items = [
+	{ label: "Home", href: "/", icon: ["M4.5 9.1v11.7m15-11.7v11.7M21 10.3l-7.5-6a2.4 2.4 0 0 0-3 0L3 10.3M3 20.8h18M15 20.8v-5a3 3 0 0 0-6 0v5"] },
+	{ label: "Tags", href: "/tags", icon: ["M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z", "M8 6.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"] },
+	{ label: "About", href: "/about", icon: ["M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8z", "M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"] },
+];
+const tocIcon = ["M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"];
+const searchIcon = ["M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14z", "M20 20l-3.9-3.9"];
+const chevron = "M19 9l-7 7-7-7";
+---
+
+<div class="fm-overlay" hidden></div>
+<div class="fm-container">
+	<div class="fm" data-state="closed" data-items={items.length + (headings.length ? 2 : 1)}>
+		<div class="fm-bg"></div>
+
+		<button type="button" class="fm-button" data-view="closed" aria-expanded="false" aria-label="Open menu">
+			<span>menu</span>
+			<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<rect x="4" y="4" width="7" height="7" rx="2.2"></rect>
+				<rect x="13" y="4" width="7" height="7" rx="3.5"></rect>
+				<rect x="4" y="13" width="7" height="7" rx="3.5"></rect>
+				<rect x="13" y="13" width="7" height="7" rx="2.2"></rect>
+			</svg>
+		</button>
+
+		<div class="fm-view" data-view="open" hidden>
+			<ul class="fm-list">
+				{
+					items.map(({ label, href, icon }) => (
+						<li>
+							<a class="fm-item" href={href}>
+								<span class="fm-toggle" />
+								<span class="fm-label">{label}</span>
+								<svg class="fm-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									{icon.map((d) => <path d={d} />)}
+								</svg>
+							</a>
+						</li>
+					))
+				}
+				{
+					headings.length > 0 && (
+						<li>
+							<button type="button" class="fm-item" data-show-toc>
+								<span class="fm-toggle">
+									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d={chevron} />
+									</svg>
+								</span>
+								<span class="fm-label">Contents</span>
+								<svg class="fm-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+									{tocIcon.map((d) => <path d={d} />)}
+								</svg>
+							</button>
+						</li>
+					)
+				}
+				<li>
+					<button type="button" class="fm-item" data-open-search>
+						<span class="fm-toggle"></span>
+						<span class="fm-label">Search</span>
+						<svg class="fm-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+							{searchIcon.map((d) => <path d={d} />)}
+						</svg>
+					</button>
+				</li>
+			</ul>
+			<button type="button" class="fm-fold" aria-label="Close menu">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M18 6l-6 6-6-6M18 18H6"></path>
+				</svg>
+			</button>
+		</div>
+
+		{
+			headings.length > 0 && (
+				<div class="fm-view fm-toc" data-view="toc" hidden>
+					<nav class="fm-toc-main" aria-label="Contents">
+						<p class="fm-toc-title">CONTENTS</p>
+						{headings.map(({ depth, slug, text }) => (
+							<a href={`#${slug}`} class:list={["fm-toc-link", { "depth-3": depth === 3 }]} data-toc-link={slug}>
+								{text}
+							</a>
+						))}
+					</nav>
+					<button type="button" class="fm-back" aria-label="Back to menu">
+						<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d={chevron} />
+						</svg>
+					</button>
+				</div>
+			)
+		}
+	</div>
+</div>
+
+<style>
+	/* catnose.me のフローティングメニューを参考にした、スマホ用の画面下メニュー */
+	.fm-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 950;
+	}
+
+	.fm-container {
+		position: fixed;
+		right: 0;
+		bottom: 5lvh;
+		left: 0;
+		z-index: 960;
+		display: none;
+		align-items: flex-end;
+		justify-content: center;
+		pointer-events: none;
+	}
+
+	@media (width <= 640px) {
+		.fm-container {
+			display: flex;
+		}
+	}
+
+	@media (width <= 425px) {
+		.fm-container {
+			bottom: calc(1.2rem + env(safe-area-inset-bottom));
+		}
+	}
+
+	.fm {
+		position: relative;
+		width: 108px;
+		height: 39px;
+		border-radius: 19.5px;
+		color: #fff;
+		pointer-events: auto;
+		-webkit-tap-highlight-color: transparent;
+		/* 行き過ぎて跳ね返らない (値が 1 を超えない) ease-out で開閉する */
+		transition:
+			width 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+			height 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+			padding 0.3s ease,
+			border-radius 0.3s ease;
+		animation: fm-in 0.4s cubic-bezier(0.32, 0.72, 0, 1) 0.2s both;
+	}
+
+	.fm[data-state="open"] {
+		padding: 7px;
+		border-radius: 20px;
+	}
+
+	.fm[data-state="toc"] {
+		padding: 7px;
+		border-radius: 28px;
+	}
+
+	@keyframes fm-in {
+		from {
+			opacity: 0;
+			scale: 0.8;
+		}
+	}
+
+	.fm-bg {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		overflow: hidden;
+		border: 1px solid rgb(255 255 255 / 0.08);
+		border-radius: inherit;
+		background: rgb(17 17 17 / 0.5);
+		backdrop-filter: blur(10px);
+		box-shadow: 0 10px 14px -10px rgb(0 0 0 / 0.2);
+		transition: background-color 0.3s ease;
+	}
+
+	.fm-bg::after {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+		content: "";
+		pointer-events: none;
+	}
+
+	.fm:not([data-state="closed"]) .fm-bg {
+		background: rgb(17 17 17 / 0.8);
+	}
+
+	[data-view][hidden] {
+		display: none !important;
+	}
+
+	.fm-button {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		height: 100%;
+		padding-inline: 14px;
+		font-size: 15px;
+		font-weight: 500;
+		-webkit-font-smoothing: antialiased;
+		animation: fm-up 0.2s ease 0.16s both;
+	}
+
+	@keyframes fm-up {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+	}
+
+	.fm-view {
+		overflow: hidden;
+		animation: fm-blur-in 0.35s ease both;
+	}
+
+	@keyframes fm-blur-in {
+		from {
+			opacity: 0;
+			filter: blur(10px);
+		}
+	}
+
+	.fm-list {
+		list-style: none;
+	}
+
+	.fm-item {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 45px;
+		padding-inline: 7px;
+		border-radius: 12px;
+		color: #fff;
+		font-size: 16.4px;
+		letter-spacing: 0.2px;
+		text-align: left;
+	}
+
+	.fm-item:hover,
+	.fm-item:active {
+		background: rgb(255 255 255 / 0.06);
+		color: #fff;
+	}
+
+	.fm-toggle {
+		display: flex;
+		align-items: center;
+		width: 23px;
+		color: rgb(255 255 255 / 0.4);
+	}
+
+	.fm-toggle svg {
+		transform: rotate(-90deg);
+	}
+
+	.fm-label {
+		flex: 1;
+	}
+
+	.fm-icon {
+		width: 27px;
+	}
+
+	.fm-fold {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 42px;
+		margin-top: 8px;
+		border: 1px solid rgb(255 255 255 / 0.09);
+		border-radius: 13px;
+		background: rgb(255 255 255 / 0.09);
+		color: rgb(255 255 255 / 0.9);
+	}
+
+	.fm-toc {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.fm-toc-main {
+		flex: 1;
+		min-height: 0;
+		overflow: hidden auto;
+		padding: 8px 4px 4px;
+		scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+		scrollbar-width: thin;
+	}
+
+	.fm-toc-title {
+		padding: 0 8px 6px;
+		color: rgb(255 255 255 / 0.45);
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+	}
+
+	.fm-toc-link {
+		display: block;
+		padding: 7px 8px;
+		border-radius: 10px;
+		color: rgb(255 255 255 / 0.82);
+		font-size: 14.5px;
+		line-height: 1.45;
+	}
+
+	.fm-toc-link:hover {
+		color: #fff;
+	}
+
+	.fm-toc-link.depth-3 {
+		padding-left: 22px;
+		color: rgb(255 255 255 / 0.6);
+		font-size: 13.5px;
+	}
+
+	.fm-toc-link.active {
+		background: rgb(255 255 255 / 0.1);
+		color: #fff;
+	}
+
+	.fm-back {
+		align-self: flex-start;
+		padding: 7px 8px;
+		color: rgb(255 255 255 / 0.5);
+	}
+
+	.fm-back svg {
+		display: block;
+		rotate: 90deg;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fm,
+		.fm-button,
+		.fm-view {
+			transition: none;
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	import { setupFloatingMenu } from "../scripts/floatingMenu";
+
+	setupFloatingMenu();
+</script>

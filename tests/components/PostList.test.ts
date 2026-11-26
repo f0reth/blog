@@ -12,7 +12,7 @@ const posts = [
 			published_at: "2025-01-01",
 			modified: null,
 			published: true,
-			tags: ["bun"],
+			tags: ["bun", "golang"],
 		},
 	},
 	{
@@ -28,47 +28,44 @@ const posts = [
 	},
 ] as unknown as Post[];
 
-test("受け取った順に記事のタイトル・説明・投稿情報を表示し、記事ページへリンクする", async () => {
+const render = async (props: { posts: Post[] }) => {
 	const container = await createContainer();
-	const document = parseHtml(
-		await container.renderToString(PostList, { props: { posts } }),
-	);
+	return parseHtml(await container.renderToString(PostList, { props }));
+};
 
-	const items = [...document.querySelectorAll("body > div > div")];
+test("受け取った順に記事の投稿日・タイトル・説明を表示し、タイトルから記事ページへリンクする", async () => {
+	const document = await render({ posts });
+
+	const items = [...document.querySelectorAll("li")];
 	expect(items).toHaveLength(2);
 
 	const [first, second] = items;
+	const title = (item: Element) => item.querySelector("h3 a");
+	expect(title(first)?.textContent).toBe("新しい記事");
+	expect(title(first)?.getAttribute("href")).toBe("/blog/20250101-new");
+	expect(title(second)?.getAttribute("href")).toBe("/blog/20240101-old");
+
 	expect(first.querySelector("p")?.textContent).toBe("新しい記事の説明");
-	expect(second.querySelector("p")?.textContent).toBe("古い記事の説明");
+	expect(first.querySelector("time")?.getAttribute("datetime")).toBe(
+		"2025-01-01",
+	);
+	expect(first.querySelector("time")?.textContent).toBe("2025年1月1日");
+});
 
-	// タイトルのリンクと矢印ボタンの両方が記事ページを指す
-	const articleLinks = (item: Element) =>
-		[...item.querySelectorAll('a[href^="/blog/2"]')].map((a) =>
-			a.getAttribute("href"),
-		);
-	expect(articleLinks(first)).toEqual([
-		"/blog/20250101-new",
-		"/blog/20250101-new",
-	]);
-	expect(articleLinks(second)).toEqual([
-		"/blog/20240101-old",
-		"/blog/20240101-old",
-	]);
-	expect(
-		first.querySelector('a[href="/blog/20250101-new"]')?.textContent,
-	).toContain("新しい記事");
+test("タグを表示名付きのタグページへのリンクとして、指定順に並べる", async () => {
+	const document = await render({ posts });
 
-	expect(first.textContent).toContain("2025-01-01");
-	expect(first.querySelector('a[href="/blog/tag/bun"]')).not.toBeNull();
-	expect(second.textContent).toContain("2024-06-01");
-	expect(second.querySelector('a[href="/blog/tag/golang"]')).not.toBeNull();
+	const links = [
+		...document.querySelectorAll("li")[0].querySelectorAll(".tags a"),
+	].map((a) => ({ href: a.getAttribute("href"), label: a.textContent }));
+	expect(links).toEqual([
+		{ href: "/tags/bun", label: "#Bun" },
+		{ href: "/tags/golang", label: "#Go言語" },
+	]);
 });
 
 test("記事がなければ何も並べない", async () => {
-	const container = await createContainer();
-	const document = parseHtml(
-		await container.renderToString(PostList, { props: { posts: [] } }),
-	);
+	const document = await render({ posts: [] });
 
-	expect(document.querySelectorAll("a")).toHaveLength(0);
+	expect(document.querySelectorAll("li")).toHaveLength(0);
 });

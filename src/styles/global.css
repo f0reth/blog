@@ -1,0 +1,195 @@
+/*
+  カラーは Zenn のデザイントークン (ライト / dark-blue) をもとにしている。
+  <html> の .dark クラス (theme.js / ThemeSwitch で切り替え) でダークテーマにする
+*/
+:root {
+	--color-primary: #3ea8ff;
+	--color-primary-hover: #0868ce;
+	--color-link: #0f83fd;
+	--color-primary-light: #e0efff;
+	--bg-primary: #fff;
+	--bg-secondary: #f5f9fc;
+	--bg-tertiary: #edf2f7;
+	--text-primary: rgb(0 0 0 / 0.82);
+	--text-secondary: #65717b;
+	--text-tertiary: #8f9faa;
+	--border-color: #e4edf4;
+	--border-color-hover: #d6e3ed;
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--nav-bg: rgb(255 255 255 / 0.8);
+	--nav-border: rgb(228 237 244 / 0.8);
+	--backdrop: blur(12px);
+	--selection: rgb(255 220 0 / 0.35);
+	--transition-fast: 0.15s ease;
+	--transition-normal: 0.25s ease;
+	--font-base:
+		-apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
+		sans-serif, "Segoe UI Emoji";
+	--font-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace, "Segoe UI Emoji";
+	/* ヘッダー・フッター・本文の外枠の幅。左右の端はすべてこの幅に揃える */
+	--page-width: 1120px;
+	--page-gutter: 1.5rem;
+	color-scheme: light;
+}
+
+@media (width <= 640px) {
+	:root {
+		--page-gutter: 1rem;
+	}
+}
+
+.dark {
+	--color-primary-hover: #8fcbff;
+	--color-link: #3ea8ff;
+	--color-primary-light: #05458a;
+	--bg-primary: #081d35;
+	--bg-secondary: #0d223a;
+	--bg-tertiary: #162c49;
+	--text-primary: #ecf5ff;
+	--text-secondary: #a4bcd5;
+	--text-tertiary: #7a9cc6;
+	--border-color: #1b324a;
+	--border-color-hover: #2e445c;
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+	--nav-bg: rgb(8 29 53 / 0.8);
+	--nav-border: rgb(27 50 74 / 0.8);
+	color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	/* スクロールバーの有無でページ幅が変わり、中央寄せのナビがずれないようにする */
+	scrollbar-gutter: stable;
+	font-family: var(--font-base);
+	scroll-behavior: smooth;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100dvh;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+	transition:
+		background-color var(--transition-normal),
+		color var(--transition-normal);
+}
+
+::selection {
+	background: var(--selection);
+}
+
+a {
+	color: var(--color-link);
+	text-decoration: none;
+	transition: color var(--transition-fast);
+}
+
+a:hover {
+	color: var(--color-primary-hover);
+}
+
+button {
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--text-primary);
+	font-weight: 700;
+	line-height: 1.4;
+	/* 日本語を文節で折り返す (対応ブラウザのみ) */
+	word-break: auto-phrase;
+}
+
+h1 {
+	font-size: 2rem;
+}
+
+p {
+	color: var(--text-secondary);
+}
+
+code,
+kbd {
+	font-family: var(--font-code);
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 2px;
+	border-radius: 6px;
+}
+
+.container {
+	width: min(100% - 2 * var(--page-gutter), var(--page-width));
+	margin-inline: auto;
+}
+
+.page-head {
+	padding: 2rem 0 1.75rem;
+}
+
+.page-head p {
+	margin-top: 0.5rem;
+}
+
+.kbd {
+	padding: 0.0625rem 0.375rem;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background: var(--bg-primary);
+	color: var(--text-tertiary);
+	font-family: inherit;
+	font-size: 0.6875rem;
+}
+
+/* ページ遷移 (同一オリジンの MPA 遷移) をフェードでつなぐ */
+@view-transition {
+	navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none;
+	}
+
+	html {
+		scroll-behavior: auto;
+	}
+}

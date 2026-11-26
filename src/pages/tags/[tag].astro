@@ -1,0 +1,24 @@
+---
+import type { GetStaticPaths } from "astro";
+import { type Tag, tags as tagLabels } from "../../../site.config";
+import PostList from "../../components/PostList.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getPostsByTag, getTagCounts } from "../../lib/posts";
+
+// 記事が 1 件もないタグのページは作らない
+export const getStaticPaths = (async () =>
+	(await getTagCounts()).map(({ tag }) => ({ params: { tag } }))) satisfies GetStaticPaths;
+
+const tag = Astro.params.tag as Tag;
+const posts = await getPostsByTag(tag);
+---
+
+<Layout title={`#${tagLabels[tag]}`}>
+	<div class="container">
+		<header class="page-head">
+			<h1>#{tagLabels[tag]}</h1>
+			<p>{posts.length} 件の記事</p>
+		</header>
+		<PostList posts={posts} />
+	</div>
+</Layout>

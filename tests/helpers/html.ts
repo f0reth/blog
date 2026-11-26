@@ -48,5 +48,32 @@ export const createContainer = async () =>
 		renderers: await loadRenderers([getContainerRenderer()]),
 	});
 
+type Container = Awaited<ReturnType<typeof createContainer>>;
+
+/** ページやコンポーネントを描画した HTML を返す */
+export const renderHtml = async (
+	component: unknown,
+	options: Parameters<Container["renderToString"]>[1] = {},
+) => {
+	const container = await createContainer();
+	return container.renderToString(
+		component as Parameters<Container["renderToString"]>[0],
+		options,
+	);
+};
+
 /** 描画結果の HTML を DOM として検証するためにパースする */
 export const parseHtml = (html: string) => new JSDOM(html).window.document;
+
+/** 記事ページを描画した HTML を返す (記事内の LinkCard のモックは呼び出し側のテストで行う) */
+export const renderArticle = async (slug: string) => {
+	const { getPostPaths } = await import("../../src/lib/posts");
+	const { default: ArticlePage } = await import(
+		"../../src/pages/blog/[slug].astro"
+	);
+	const path = (await getPostPaths()).find(
+		({ params }) => params.slug === slug,
+	);
+	if (!path) throw new Error(`post not found: ${slug}`);
+	return renderHtml(ArticlePage, path);
+};

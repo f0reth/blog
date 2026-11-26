@@ -28,11 +28,6 @@
 		"enabled": true,
 		"includes": ["**/*.js", "**/*.mjs", "**/*.ts", "**/*.json", "**/*.jsonc"]
 	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
-	},
 	"overrides": [
 		{
 			"includes": ["**/*.astro"],

@@ -1,0 +1,116 @@
+---
+import { Image } from "astro:assets";
+import { SiteConfig } from "../../site.config";
+import profile from "../assets/profile.avif";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="About">
+	<div class="container">
+		<div class="about">
+			<div class="profile">
+				<Image src={profile} alt={`${SiteConfig.blogName} のプロフィール画像`} width={80} height={80} class="avatar" />
+				<div>
+					<h1>{SiteConfig.blogName}</h1>
+					<p>フロントエンド開発者です。バックエンドも少しやります。</p>
+				</div>
+			</div>
+			<p>このブログでは、プログラミングで調べたことや試したこと、日常のことを書いています。</p>
+
+			<h2>よく書くこと</h2>
+			<ul>
+				<li>Go言語 / Bun / TypeScript</li>
+				<li>Windows・Linux の環境構築メモ</li>
+				<li>モノレポやビルドツールのお試し</li>
+			</ul>
+
+			<h2>このサイトについて</h2>
+			<ul>
+				<li>Astro で静的生成し、Cloudflare Workers で配信しています</li>
+				<li>テーマは端末の設定に合わせて自動で切り替わります</li>
+				<li>検索は <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">K</kbd> で開けます</li>
+			</ul>
+
+			<h2>リンク</h2>
+			<div class="links">
+				<a href="https://x.com/f0reth" target="_blank" rel="noreferrer">X (@f0reth)</a>
+				<a href="https://github.com/f0reth" target="_blank" rel="noreferrer">GitHub</a>
+				<a href="/feed.xml">RSS フィード</a>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.about {
+		max-width: 640px;
+		padding: 2rem 0;
+	}
+
+	.profile {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		margin-bottom: 2rem;
+	}
+
+	.avatar {
+		flex: none;
+		width: 80px;
+		height: 80px;
+		border-radius: 9999px;
+		box-shadow:
+			0 0 0 4px var(--bg-primary),
+			0 0 0 5px var(--border-color);
+		object-fit: cover;
+	}
+
+	h1 {
+		font-size: 1.75rem;
+	}
+
+	.profile p {
+		margin-top: 0.25rem;
+		font-size: 0.9375rem;
+	}
+
+	h2 {
+		margin: 2rem 0 0.75rem;
+		font-size: 1.25rem;
+	}
+
+	ul {
+		padding-left: 1.25rem;
+	}
+
+	li {
+		margin-bottom: 0.375rem;
+		color: var(--text-secondary);
+	}
+
+	li::marker {
+		color: var(--color-primary);
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.links a {
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--border-color);
+		border-radius: 9999px;
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: all var(--transition-fast);
+	}
+
+	.links a:hover {
+		border-color: var(--color-primary);
+		color: var(--color-primary);
+	}
+</style>

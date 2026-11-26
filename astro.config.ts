@@ -1,6 +1,5 @@
 import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
-import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, passthroughImageService } from "astro/config";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypePrettyCode from "rehype-pretty-code";
@@ -18,9 +17,6 @@ export default defineConfig({
 		concurrency: 8,
 	},
 	integrations: [mdx()],
-	vite: {
-		plugins: [tailwindcss()],
-	},
 	image: {
 		// 記事画像は AVIF で用意済みのため変換せずそのまま配信する (WebP 変換だとサイズが増える)
 		service: passthroughImageService(),
@@ -33,7 +29,14 @@ export default defineConfig({
 			remarkPlugins: [remarkAlert],
 			rehypePlugins: [
 				[rehypeExternalLinks, { rel: ["noreferrer"], target: ["_blank"] }],
-				[rehypePrettyCode, { theme: "dark-plus", keepBackground: false }],
+				// ライト/ダークの色を CSS 変数 (--shiki-light / --shiki-dark) で出力し、サイトのテーマに合わせて切り替える
+				[
+					rehypePrettyCode,
+					{
+						theme: { light: "github-light", dark: "github-dark" },
+						keepBackground: false,
+					},
+				],
 				rehypeCopyButton,
 			],
 		}),

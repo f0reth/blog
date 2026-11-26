@@ -1,0 +1,191 @@
+---
+import { Image } from "astro:assets";
+import { SiteConfig } from "../../site.config";
+import profile from "../assets/profile.avif";
+import { publicPath } from "../lib/url";
+import ThemeSwitch from "./ThemeSwitch.astro";
+
+const path = publicPath(Astro.url.pathname);
+
+// icon は 24x24 の SVG パス
+const links = [
+	{
+		href: "/",
+		label: "Home",
+		active: path === "/",
+		icon: ["M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"],
+	},
+	{
+		href: "/tags",
+		label: "Tags",
+		active: path.startsWith("/tags"),
+		icon: ["M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z", "M7 7h.01"],
+	},
+	{
+		href: "/about",
+		label: "About",
+		active: path === "/about",
+		icon: ["M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2", "M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"],
+	},
+];
+---
+
+<nav class="capsule-nav" aria-label="Main">
+	<div class="nav-inner">
+		<div class="nav-left">
+			<a href="/" class="logo">
+				<Image src={profile} alt="" width={28} height={28} class="logo-image" />
+				<span>{SiteConfig.blogName}</span>
+			</a>
+			<div class="links">
+				{
+					links.map(({ href, label, active, icon }) => (
+						<a href={href} class="link" aria-current={active ? "page" : undefined}>
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								{icon.map((d) => <path d={d} />)}
+							</svg>
+							<span>{label}</span>
+						</a>
+					))
+				}
+			</div>
+		</div>
+		<div class="nav-right">
+			<button type="button" class="search-button" data-open-search aria-label="Search">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<circle cx="11" cy="11" r="8"></circle>
+					<path d="M21 21l-4.35-4.35"></path>
+				</svg>
+				<span class="search-text">Search</span>
+				<kbd class="kbd" data-search-shortcut>Ctrl K</kbd>
+			</button>
+			<ThemeSwitch />
+		</div>
+	</div>
+</nav>
+
+<style>
+	.capsule-nav {
+		position: fixed;
+		top: 1rem;
+		left: 50%;
+		z-index: 1000;
+		width: min(100% - 2 * var(--page-gutter), var(--page-width));
+		transform: translateX(-50%);
+		view-transition-name: nav;
+	}
+
+	.nav-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.625rem 0.75rem 0.625rem 1rem;
+		border: 1px solid var(--nav-border);
+		border-radius: 9999px;
+		background: var(--nav-bg);
+		backdrop-filter: var(--backdrop);
+		box-shadow: var(--shadow-md);
+	}
+
+	.nav-left,
+	.nav-right {
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-left {
+		gap: 1.75rem;
+	}
+
+	.nav-right {
+		gap: 0.625rem;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--text-primary);
+		font-size: 1.0625rem;
+		font-weight: 700;
+	}
+
+	.logo:hover {
+		color: var(--color-primary);
+	}
+
+	.logo-image {
+		width: 28px;
+		height: 28px;
+		border-radius: 9999px;
+		box-shadow: 0 0 0 1px var(--border-color);
+		object-fit: cover;
+	}
+
+	.links {
+		display: flex;
+		gap: 1.5rem;
+	}
+
+	.link {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+		font-weight: 600;
+	}
+
+	.link:hover,
+	.link[aria-current="page"] {
+		color: var(--color-primary);
+	}
+
+	.search-button {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+		border: 1px solid var(--border-color);
+		border-radius: 9999px;
+		background: var(--bg-secondary);
+		color: var(--text-secondary);
+		font-size: 0.8125rem;
+		transition: all var(--transition-fast);
+	}
+
+	/*
+	  テキストの行ボックスをキャップハイト〜ベースラインに切り詰め、フォントのメトリクスに
+	  関係なくアイコンと文字の見た目の中心を揃える
+	*/
+	.logo span,
+	.link span,
+	.search-text,
+	.search-button .kbd {
+		text-box: trim-both cap alphabetic;
+	}
+
+	.search-button .kbd {
+		padding: 0.25rem 0.375rem;
+	}
+
+	.search-button:hover {
+		border-color: var(--border-color-hover);
+		background: var(--bg-tertiary);
+		color: var(--text-primary);
+	}
+
+	/* スマホではナビのリンクを隠し、FloatingMenu から移動する */
+	@media (width <= 640px) {
+		.links,
+		.search-text,
+		.search-button .kbd {
+			display: none;
+		}
+
+		.search-button {
+			padding: 0.5rem;
+		}
+	}
+</style>

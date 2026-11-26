@@ -1,0 +1,108 @@
+<dialog class="lightbox" aria-label="画像">
+	<img alt="" />
+	<button type="button" class="close" data-action="close" aria-label="閉じる">
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+			<path d="M18 6L6 18M6 6l12 12"></path>
+		</svg>
+	</button>
+	<button type="button" class="prev" data-action="prev" aria-label="前の画像">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+			<path d="M15 18l-6-6 6-6"></path>
+		</svg>
+	</button>
+	<button type="button" class="next" data-action="next" aria-label="次の画像">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+			<path d="M9 18l6-6-6-6"></path>
+		</svg>
+	</button>
+	<span class="count"></span>
+</dialog>
+
+<style>
+	.lightbox {
+		width: 100%;
+		max-width: none;
+		height: 100%;
+		max-height: none;
+		border: 0;
+		background: rgb(0 0 0 / 0.9);
+		opacity: 0;
+		transition:
+			opacity var(--transition-normal),
+			overlay var(--transition-normal) allow-discrete,
+			display var(--transition-normal) allow-discrete;
+	}
+
+	.lightbox[open] {
+		display: grid;
+		place-items: center;
+		opacity: 1;
+	}
+
+	@starting-style {
+		.lightbox[open] {
+			opacity: 0;
+		}
+	}
+
+	img {
+		max-width: 90vw;
+		max-height: 85vh;
+		border-radius: 10px;
+	}
+
+	button {
+		position: absolute;
+		display: grid;
+		place-items: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.1);
+		color: #fff;
+		transition: background var(--transition-fast);
+	}
+
+	button:hover {
+		background: rgb(255 255 255 / 0.2);
+	}
+
+	.close {
+		top: 1rem;
+		right: 1rem;
+	}
+
+	.prev,
+	.next {
+		top: 50%;
+		translate: 0 -50%;
+	}
+
+	.prev {
+		left: 1rem;
+	}
+
+	.next {
+		right: 1rem;
+	}
+
+	.count {
+		position: absolute;
+		bottom: 1.25rem;
+		left: 50%;
+		color: rgb(255 255 255 / 0.8);
+		font-size: 0.8125rem;
+		translate: -50% 0;
+	}
+
+	.lightbox[data-single] :is(.prev, .next, .count) {
+		display: none;
+	}
+</style>
+
+<script>
+	import { setupImageLightbox } from "../scripts/lightbox";
+
+	setupImageLightbox();
+</script>
+

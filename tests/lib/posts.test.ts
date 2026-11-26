@@ -1,6 +1,12 @@
 import { describe, expect, test, vi } from "vitest";
 import type { Tag } from "../../site.config";
-import { getPosts, getPostsByTag, type Post } from "../../src/lib/posts";
+import {
+	formatDate,
+	getPosts,
+	getPostsByTag,
+	getTagCounts,
+	type Post,
+} from "../../src/lib/posts";
 
 const makePost = (
 	id: string,
@@ -66,5 +72,22 @@ describe("getPostsByTag", () => {
 
 	test("該当する記事がないタグでは空配列を返す", async () => {
 		expect(await getPostsByTag("python")).toEqual([]);
+	});
+});
+
+describe("getTagCounts", () => {
+	test("公開記事のあるタグだけを記事数の多い順 (同数なら site.config.ts の定義順) に返し、下書きは数えない", async () => {
+		// golang は下書きにも付いているが数えない。bun と同数なので定義順で bun が先
+		expect(await getTagCounts()).toEqual([
+			{ tag: "bun", count: 2 },
+			{ tag: "golang", count: 2 },
+		]);
+	});
+});
+
+describe("formatDate", () => {
+	test("YYYY-MM-DD を先頭の 0 を省いた日本語の日付にする", () => {
+		expect(formatDate("2024-07-04")).toBe("2024年7月4日");
+		expect(formatDate("2025-11-29")).toBe("2025年11月29日");
 	});
 });

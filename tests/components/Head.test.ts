@@ -48,7 +48,7 @@ describe("Head", () => {
 			meta(await render({}, path), 'property="og:url"');
 
 		expect(await ogUrl("/index.html")).toBe("https://daichi2mori.com/");
-		expect(await ogUrl("/blog.html")).toBe("https://daichi2mori.com/blog");
+		expect(await ogUrl("/tags.html")).toBe("https://daichi2mori.com/tags");
 		expect(await ogUrl("/blog/20240714-bun-sqlite.html")).toBe(
 			"https://daichi2mori.com/blog/20240714-bun-sqlite",
 		);
@@ -70,6 +70,14 @@ describe("Head", () => {
 		expect(meta(document, 'property="og:image"')).toBe(
 			"https://daichi2mori.com/ogp.png",
 		);
+	});
+
+	test("独自のダークテーマを Dark Reader に上書きさせない", async () => {
+		const document = await render({});
+
+		expect(
+			document.querySelector('meta[name="darkreader-lock"]'),
+		).not.toBeNull();
 	});
 
 	test("テーマ切替スクリプトを描画前に実行されるようインラインで埋め込む", async () => {

@@ -10,31 +10,90 @@ const { url } = Astro.props;
 const ogpData = await fetchOgp(url);
 ---
 
-<a
-	href={url}
-	target="_blank"
-	rel="noreferrer"
-	class="w-full h-32 sm:h-36 md:h-40 my-6 flex justify-between border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-opacity hover:opacity-65"
->
-	<div class="px-3 py-3 md:px-6 md:py-4 flex flex-col justify-between">
-		<span class="text-lg sm:text-2xl font-bold text-ellipsis line-clamp-1">
-			{ogpData.title ?? url}
+<a href={url} target="_blank" rel="noreferrer" class="link-card">
+	<span class="body">
+		<span class="title">{ogpData.title ?? url}</span>
+		{ogpData.description && <span class="description">{ogpData.description}</span>}
+		<span class="host">
+			{ogpData.favicon && <img src={ogpData.favicon} alt="favicon" width="14" height="14" />}
+			{ogpData.host}
 		</span>
-		<span class="text-xs sm:text-base text-gray-500 text-ellipsis line-clamp-2">
-			{ogpData.description}
-		</span>
-		<div class="flex items-center gap-1 sm:gap-2">
-			<img src={ogpData.favicon} alt="favicon" class="w-3 h-3 sm:w-4 sm:h-4" />
-			<span class="text-xs sm:text-sm">{ogpData.host}</span>
-		</div>
-	</div>
-	{
-		ogpData.image && (
-			<img
-				src={ogpData.image}
-				alt="ogp"
-				class="h-full object-cover aspect-square xs:aspect-23/12 rounded-r-lg"
-			/>
-		)
-	}
+	</span>
+	{ogpData.image && <img src={ogpData.image} alt="ogp" class="thumbnail" />}
 </a>
+
+<style>
+	.link-card {
+		display: flex;
+		overflow: hidden;
+		border: 1px solid var(--border-color);
+		border-radius: 12px;
+		background: var(--bg-primary);
+		color: inherit;
+		text-decoration: none;
+		transition: all var(--transition-fast);
+	}
+
+	.link-card:hover {
+		border-color: var(--border-color-hover);
+		background: var(--bg-secondary);
+		color: inherit;
+	}
+
+	.body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		justify-content: center;
+		gap: 0.25rem;
+		min-width: 0;
+		padding: 0.875rem 1.125rem;
+		line-height: 1.5;
+	}
+
+	.title {
+		overflow: hidden;
+		color: var(--text-primary);
+		font-size: 0.9375rem;
+		font-weight: 700;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.description {
+		display: -webkit-box;
+		overflow: hidden;
+		color: var(--text-secondary);
+		font-size: 0.8125rem;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+
+	.host {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		margin-top: 0.125rem;
+		color: var(--text-tertiary);
+		font-size: 0.75rem;
+	}
+
+	.host img {
+		width: 14px;
+		height: 14px;
+	}
+
+	.thumbnail {
+		flex: none;
+		width: 200px;
+		aspect-ratio: 1.91;
+		object-fit: cover;
+	}
+
+	@media (width <= 520px) {
+		.thumbnail {
+			width: 104px;
+			aspect-ratio: 1;
+		}
+	}
+</style>

@@ -1,0 +1,67 @@
+---
+import { tags as tagLabels } from "../../../site.config";
+import Layout from "../../layouts/Layout.astro";
+import { getTagCounts } from "../../lib/posts";
+
+const tagCounts = await getTagCounts();
+---
+
+<Layout title="タグ">
+	<div class="container">
+		<header class="page-head">
+			<h1>タグ</h1>
+			<p>{tagCounts.length} 個のタグ</p>
+		</header>
+		<ul class="tags">
+			{
+				tagCounts.map(({ tag, count }) => (
+					<li>
+						<a href={`/tags/${tag}`}>
+							#{tagLabels[tag]}
+							<span>{count}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</Layout>
+
+<style>
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		list-style: none;
+	}
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--border-color);
+		border-radius: 9999px;
+		background: var(--bg-secondary);
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: all var(--transition-fast);
+	}
+
+	span {
+		color: var(--text-tertiary);
+		font-size: 0.75rem;
+		transition: inherit;
+	}
+
+	a:hover {
+		border-color: var(--color-primary);
+		background: var(--color-primary);
+		color: #fff;
+	}
+
+	a:hover span {
+		color: rgb(255 255 255 / 0.8);
+	}
+</style>

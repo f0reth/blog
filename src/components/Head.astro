@@ -1,8 +1,8 @@
 ---
 import { createHash } from "node:crypto";
 import { SiteConfig } from "../../site.config";
+import { publicPath } from "../lib/url";
 import themeScript from "../scripts/theme.js?raw";
-import "../styles/style.css";
 
 type Props = {
 	title?: string;
@@ -14,8 +14,7 @@ const { title, desc, slug } = Astro.props;
 
 const pageTitle = title ? `${title} - ${SiteConfig.blogName}` : SiteConfig.blogName;
 const description = desc ?? SiteConfig.description;
-// build.format: "file" ではビルド時の pathname が `/blog.html` になるため、公開 URL (`/blog`) に揃える
-const pageUrl = new URL(Astro.url.pathname.replace(/(index)?\.html$/, ""), SiteConfig.url).href;
+const pageUrl = new URL(publicPath(Astro.url.pathname), SiteConfig.url).href;
 const ogImage = new URL(slug ? `ogps/${slug}.png` : "ogp.png", SiteConfig.url).href;
 
 // インラインのテーマ切替スクリプトを CSP で許可するためにハッシュを登録する
@@ -24,7 +23,10 @@ Astro.csp?.insertScriptHash(`sha256-${themeScriptHash}`);
 ---
 
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<!-- 独自のダークテーマを持つため、Dark Reader による色の上書きを止める -->
+<meta name="darkreader-lock" />
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <meta property="og:url" content={pageUrl} />

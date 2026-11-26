@@ -43,15 +43,21 @@ describe.each([
 		expect(alert?.textContent).toContain("警告文");
 	});
 
-	test("コードブロックを dark-plus テーマでハイライトし、背景色はサイトの CSS に任せる", () => {
+	test("コードブロックをライト/ダーク両方のテーマでハイライトし、背景色はサイトの CSS に任せる", () => {
 		const pre = document.querySelector(
 			"figure[data-rehype-pretty-code-figure] pre",
 		);
 		expect(pre?.getAttribute("data-language")).toBe("go");
-		expect(pre?.getAttribute("data-theme")).toBe("dark-plus");
+		expect(pre?.getAttribute("data-theme")).toBe("github-light github-dark");
 		expect(pre?.getAttribute("style") ?? "").not.toContain("background");
-		const tokens = pre?.querySelectorAll("span[style*='color']");
-		expect(tokens?.length).toBeGreaterThan(0);
+		// サイトのテーマに合わせて CSS で切り替えられるよう、色は CSS 変数で両方持つ
+		const tokens = [...(pre?.querySelectorAll("[data-line] span") ?? [])];
+		expect(tokens.length).toBeGreaterThan(0);
+		for (const token of tokens) {
+			expect(token.getAttribute("style")).toMatch(
+				/--shiki-light:.+;--shiki-dark:/,
+			);
+		}
 	});
 
 	test("コードブロックにコピーボタンを追加する", () => {

@@ -1,35 +1,235 @@
 ---
 import { render } from "astro:content";
 import type { GetStaticPaths } from "astro";
+import { tags as tagLabels } from "../../../site.config";
+import ImageLightbox from "../../components/ImageLightbox.astro";
 import LinkCard from "../../components/LinkCard.astro";
-import Publish from "../../components/Publish.astro";
-import BlogLayout from "../../layouts/BlogLayout.astro";
-import { getPostPaths, type Post } from "../../lib/posts";
+import Toc from "../../components/Toc.astro";
+import Layout from "../../layouts/Layout.astro";
+import { formatDate, getPostPaths, getPosts, type Post } from "../../lib/posts";
+import "../../styles/markdown.css";
 
 export const getStaticPaths = getPostPaths satisfies GetStaticPaths;
 
 type Props = { post: Post };
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { title, description, published_at, modified, tags } = post.data;
+const { Content, headings } = await render(post);
+const toc = headings.filter(({ depth }) => depth === 2 || depth === 3);
+
+// 一覧 (新しい順) で隣り合う記事。older が「前の記事」、newer が「次の記事」
+const posts = await getPosts();
+const index = posts.findIndex(({ id }) => id === post.id);
+const newer = posts[index - 1];
+const older = posts[index + 1];
 ---
 
-<BlogLayout title={post.data.title} desc={post.data.description} slug={post.id}>
-	<article class="bg-card rounded-[16px] px-4 md:px-9 pt-6 pb-4 flex flex-col gap-4">
-		<div class="relative">
-			<h1
-				class="text-2xl md:text-4xl font-bold md:before:w-1 md:before:h-5 md:before:rounded-md md:before:bg-primary md:before:absolute md:before:top-3 md:before:-left-4.5"
-			>
-				{post.data.title}
-			</h1>
-		</div>
-		<Publish {...post.data} />
-		<div class="markdown"><Content components={{ LinkCard }} /></div>
-	</article>
-</BlogLayout>
+<Layout title={title} desc={description} slug={post.id} headings={toc}>
+	<div class="reading-progress" aria-hidden="true"></div>
+	<div class="post-layout">
+		<article>
+			<header class="post-header">
+				<div class="meta">
+					<time datetime={published_at}>{formatDate(published_at)}</time>
+					{modified && <span>（{formatDate(modified)} 更新）</span>}
+				</div>
+				<h1>{title}</h1>
+				<p>{description}</p>
+				<div class="tags">
+					{tags.map((tag) => <a href={`/tags/${tag}`}>#{tagLabels[tag]}</a>)}
+				</div>
+			</header>
+			<div class="markdown"><Content components={{ LinkCard }} /></div>
+			{
+				(older || newer) && (
+					<nav class="post-nav" aria-label="前後の記事">
+						{older && (
+							<a href={`/blog/${older.id}`} class="older">
+								<span class="label">← 前の記事</span>
+								<span class="title">{older.data.title}</span>
+							</a>
+						)}
+						{newer && (
+							<a href={`/blog/${newer.id}`} class="newer">
+								<span class="label">次の記事 →</span>
+								<span class="title">{newer.data.title}</span>
+							</a>
+						)}
+					</nav>
+				)
+			}
+		</article>
+		{
+			toc.length > 0 && (
+				<aside class="sidebar">
+					<Toc headings={toc} />
+				</aside>
+			)
+		}
+	</div>
+	<ImageLightbox />
+</Layout>
 
 <script>
 	import { setupCopyButtons } from "../../scripts/copyCode";
 
 	setupCopyButtons();
 </script>
+
+<style>
+	.reading-progress {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 1100;
+		height: 2px;
+		background: var(--color-primary);
+		transform: scaleX(0);
+		transform-origin: 0 50%;
+		pointer-events: none;
+	}
+
+	/* スクロール量に応じて伸ばす (scroll-driven animations 対応ブラウザのみ) */
+	@supports (animation-timeline: scroll()) {
+		.reading-progress {
+			animation: progress linear both;
+			animation-timeline: scroll(root);
+		}
+	}
+
+	@keyframes progress {
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	/* 本文は読みやすい行長 (720px) に留め、目次と合わせてページの中央に置く */
+	.post-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 720px) 200px;
+		align-items: start;
+		justify-content: center;
+		gap: 2.5rem;
+		width: min(100% - 2 * var(--page-gutter), var(--page-width));
+		margin-inline: auto;
+	}
+
+	article {
+		min-width: 0;
+		padding: 2rem 0;
+	}
+
+	.sidebar {
+		position: sticky;
+		top: 6rem;
+		padding-top: 2rem;
+	}
+
+	.post-header {
+		margin-bottom: 2rem;
+		padding-bottom: 2rem;
+		border-bottom: 1px solid var(--border-color);
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		color: var(--text-tertiary);
+		font-size: 0.8125rem;
+	}
+
+	h1 {
+		margin: 0.75rem 0 1rem;
+		font-size: 2.25rem;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.75rem;
+		margin-top: 0.875rem;
+		font-size: 0.8125rem;
+	}
+
+	.tags a:hover {
+		text-decoration: underline;
+	}
+
+	.post-nav {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-top: 3.5rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--border-color);
+	}
+
+	.post-nav a {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 0;
+		padding: 1rem 1.25rem;
+		border: 1px solid var(--border-color);
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		transition: all var(--transition-fast);
+	}
+
+	.post-nav a:hover {
+		border-color: var(--color-primary);
+		background: var(--bg-tertiary);
+	}
+
+	.post-nav .newer {
+		grid-column: 2;
+		text-align: right;
+	}
+
+	.label {
+		color: var(--text-tertiary);
+		font-size: 0.75rem;
+	}
+
+	.title {
+		overflow: hidden;
+		color: var(--text-primary);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.post-nav a:hover .title {
+		color: var(--color-link);
+	}
+
+	/* 本文 720px + 間隔 40px + 目次 200px (= 960px) が収まらない幅では目次を隠す */
+	@media (width <= 1024px) {
+		.post-layout {
+			grid-template-columns: minmax(0, 720px);
+		}
+
+		.sidebar {
+			display: none;
+		}
+	}
+
+	@media (width <= 640px) {
+		h1 {
+			font-size: 1.625rem;
+		}
+	}
+
+	@media (width <= 480px) {
+		.post-nav {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.post-nav .newer {
+			grid-column: 1;
+			text-align: left;
+		}
+	}
+</style>
