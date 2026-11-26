@@ -1,6 +1,49 @@
 import { readFileSync } from "node:fs";
 import { Resvg } from "@resvg/resvg-js";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { SiteConfig } from "../../site.config";
+
+type Node = { type: string; props: { tw?: string; children?: unknown } };
+
+// satori に渡された要素ツリーを記録する (描画自体は本物の satori で行う)
+const satoriElements = vi.hoisted(() => [] as Node[]);
+vi.mock("satori", async (importOriginal) => {
+	const { default: satori } = await importOriginal<typeof import("satori")>();
+	return {
+		default: (element: Node, options: Parameters<typeof satori>[1]) => {
+			satoriElements.push(element);
+			return satori(element as Parameters<typeof satori>[0], options);
+		},
+	};
+});
+
+/** 要素ツリーから条件に合う要素を探す */
+const findNode = (
+	node: unknown,
+	match: (node: Node) => boolean,
+): Node | undefined => {
+	if (Array.isArray(node)) {
+		for (const child of node) {
+			const found = findNode(child, match);
+			if (found) return found;
+		}
+		return undefined;
+	}
+	if (!node || typeof node !== "object") return undefined;
+	return match(node as Node)
+		? (node as Node)
+		: findNode((node as Node).props.children, match);
+};
+
+/** 要素ツリー内のテキストをすべて集める */
+const texts = (node: unknown): string[] =>
+	typeof node === "string"
+		? [node]
+		: Array.isArray(node)
+			? node.flatMap(texts)
+			: node && typeof node === "object"
+				? texts((node as Node).props.children)
+				: [];
 
 const FONT_CSS_URL = "https://fonts.googleapis.com/css2";
 const FONT_FILE_URL = "https://fonts.gstatic.com/s/notosansjp/font.otf";
@@ -65,6 +108,7 @@ const loadRenderOgImage = async () =>
 describe("renderOgImage", () => {
 	beforeEach(() => {
 		vi.resetModules();
+		satoriElements.length = 0;
 	});
 
 	afterEach(() => {
@@ -93,6 +137,36 @@ describe("renderOgImage", () => {
 		const b = await renderOgImage("Second article");
 
 		expect(Buffer.from(a).equals(Buffer.from(b))).toBe(false);
+	});
+
+	test("日本語のタイトルは BudouX で文節ごとに分け、文節の途中で改行されないようにする", async () => {
+		stubFetch();
+		const renderOgImage = await loadRenderOgImage();
+
+		await renderOgImage("Bun で SQLite を使って Todo アプリを作る");
+
+		// flex-wrap のコンテナでは子要素の間でだけ折り返される
+		const title = findNode(satoriElements[0], ({ props }) =>
+			String(props.tw).includes("flex-wrap"),
+		);
+		expect(title?.props.children).toEqual([
+			"Bun で",
+			" SQLite を",
+			"使って",
+			" Todo アプリを",
+			"作る",
+		]);
+	});
+
+	test("ブログ名とドメインを画像に入れる", async () => {
+		stubFetch();
+		const renderOgImage = await loadRenderOgImage();
+
+		await renderOgImage("x");
+
+		expect(texts(satoriElements[0])).toEqual(
+			expect.arrayContaining([SiteConfig.blogName, "daichi2mori.com"]),
+		);
 	});
 
 	test("Google Fonts から Noto Sans JP (weight 600) を取得する", async () => {

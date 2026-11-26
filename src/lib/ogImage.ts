@@ -73,8 +73,13 @@ export const renderOgImage = async (
 		},
 	);
 
+	// satori が文字をパスに変換済みなのでフォントは不要。既定のシステムフォント読み込みは
+	// 1 枚あたり 100ms 以上かかるため無効化する
+	const png = new Resvg(svg, { font: { loadSystemFonts: false } })
+		.render()
+		.asPng();
 	// Response の BodyInit に渡せるよう ArrayBuffer ベースの Uint8Array にコピーする
-	return new Uint8Array(new Resvg(svg).render().asPng());
+	return new Uint8Array(png);
 };
 
 /** Google Fonts から Noto Sans JP (SemiBold) を取得する */

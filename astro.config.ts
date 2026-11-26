@@ -14,6 +14,8 @@ export default defineConfig({
 	build: {
 		// `blog.html` / `blog/<slug>.html` 形式で出力する
 		format: "file",
+		// LinkCard の OGP 取得や OGP 画像用フォントの取得など、ネットワーク待ちを並行させる
+		concurrency: 8,
 	},
 	integrations: [mdx()],
 	vite: {
