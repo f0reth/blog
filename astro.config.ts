@@ -10,6 +10,9 @@ import { rehypeCopyButton } from "./src/lib/rehypeCopyButton";
 export default defineConfig({
 	site: SiteConfig.url,
 	output: "static",
+	// astro build はコンテンツのデータストアを cacheDir に書き出すが、vitest (Vite の serve) は .astro/ から読むため揃える。
+	// 既定の node_modules/.astro のままだと、astro dev を実行していない CI では vitest から記事が 1 件も見えない
+	cacheDir: "./.astro",
 	build: {
 		// `blog.html` / `blog/<slug>.html` 形式で出力する
 		format: "file",
